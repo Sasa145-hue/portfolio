@@ -19,6 +19,7 @@
 
   --font-t: 'Bebas Neue', sans-serif;
   --font-b: 'DM Sans', sans-serif;
+  --font-s: 'Playfair Display', serif;
   --ease:   cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -75,9 +76,9 @@ ul,ol { list-style: none; }
   width: 40px; height: 40px;
   border-radius: 50%;
   border: 2.5px solid var(--accent);
-  transform: translate(-50%, -50%);
-  transition: width .28s var(--ease), height .28s var(--ease),
-              border-color .65s ease, background .28s ease;
+  /* transform handled by GSAP (xPercent/yPercent + x/y) */
+  transition: border-color .65s ease;
+  will-change: transform;
 }
 
 .cursor-dot {
@@ -85,15 +86,10 @@ ul,ol { list-style: none; }
   width: 6px; height: 6px;
   background: var(--accent);
   border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: background .65s ease, width .2s, height .2s;
+  /* transform handled by GSAP */
+  transition: background .65s ease;
+  will-change: transform;
 }
-
-body.cur-hover .cursor-ring {
-  width: 58px; height: 58px;
-  background: var(--accent-soft);
-}
-body.cur-click .cursor-ring { width: 28px; height: 28px; opacity: .6; }
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -431,8 +427,9 @@ body.mode-perso .perso-section { display: block; }
 }
 
 .s-num {
-  font-family: var(--font-t);
-  font-size: .82rem; letter-spacing: .14em;
+  font-family: var(--font-s);
+  font-style: italic;
+  font-size: .82rem; letter-spacing: .04em;
   color: var(--accent);
   transition: color .65s ease;
 }
@@ -455,6 +452,24 @@ body.mode-perso .perso-section { display: block; }
   transition: opacity .7s var(--ease), transform .7s var(--ease);
 }
 .reveal-h.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ── Typographie éditoriale ── */
+.serif-italic {
+  font-family: var(--font-s);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Hero lines — mode GSAP : overflow masking remplace clip-path */
+.hero-name.gsap-driven .line {
+  overflow: hidden;
+  clip-path: none !important;
+  transition: none;
+}
+.hero-name.gsap-driven .line .line-inner {
+  display: block;
+  will-change: transform;
+}
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -1331,10 +1346,12 @@ body.mode-perso .modal-logo-big {
 ══════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-  .hero-name .line { clip-path: inset(0 0% 0 0); }
+  .hero-name .line,
+  .hero-name.gsap-driven .line .line-inner { transform: none !important; clip-path: none; }
   .reveal, .reveal-h { opacity: 1; transform: none; }
   .char { opacity: 1; transform: none; }
   .hero-particles { display: none; }
   .apropos-bg-orb { transform: translate(-50%, -50%) scale(1) !important; }
   .section-alt { clip-path: none !important; }
+  .cursor-ring, .cursor-dot { display: none; }
 }
