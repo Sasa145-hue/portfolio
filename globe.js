@@ -182,8 +182,6 @@
   function initGlobe(containerId, data) {
     var container = document.getElementById(containerId);
     if (!container) return;
-    var canvas = container.querySelector('.globe-canvas');
-    if (!canvas) return;
 
     var R       = 1.85;
     var C_MAIN  = data.color;
@@ -226,13 +224,19 @@
     /* ── Renderer ── */
     var renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     } catch (_) { return; }
 
-    var W = container.clientWidth  || 800;
-    var H = container.clientHeight || 620;
+    var W = container.offsetWidth  || 800;
+    var H = container.offsetHeight || 620;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(W, H, false);
+    renderer.setSize(W, H);
+
+    /* Vide le placeholder et monte le vrai canvas Three.js */
+    container.querySelectorAll('.globe-canvas').forEach(function (el) { el.remove(); });
+    var canvas = renderer.domElement;
+    canvas.className = 'globe-canvas';
+    container.appendChild(canvas);
 
     var scene  = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
@@ -431,6 +435,31 @@
       });
     }
 
+    /* ── Interaction ── */
+    var mouse = new THREE.Vector2(-9, -9);
+    var ray   = new THREE.Raycaster();
+    ray.params.Line = { threshold: 0.1 };
+    var interMeshes = NODES.map(function (nd) { return meshes[nd.id]; }).filter(Boolean);
+
+    var hovId       = -1;
+    var autoRot     = !reduced;
+    var rotY        = 0;
+    var tX = 0, tY = 0, tgX = 0, tgY = 0;
+    var lastCX = 0, lastCY = 0;
+
+    /* ── Zoom état ── */
+    var BASE_Z       = 5.5;
+    var camTarget    = new THREE.Vector3(0, 0, BASE_Z);
+    var zoomedMainId = -1;
+    var zoomMeshes   = [];
+
+    /* Bouton ← Retour */
+    var backBtn = document.createElement('button');
+    backBtn.className = 'globe-back-btn';
+    backBtn.textContent = '← Retour';
+    backBtn.style.display = 'none';
+    container.appendChild(backBtn);
+
     function zoomToNode(nd) {
       var worldPos = new THREE.Vector3();
       meshes[nd.id].getWorldPosition(worldPos);
@@ -458,32 +487,6 @@
 
     backBtn.addEventListener('click', resetZoom);
     container.addEventListener('glob:reset', resetZoom);
-
-    /* ── Interaction ── */
-    var mouse = new THREE.Vector2(-9, -9);
-    var ray   = new THREE.Raycaster();
-    /* Augmenter le seuil de raycasting pour faciliter le hover */
-    ray.params.Line = { threshold: 0.1 };
-    var interMeshes = NODES.map(function (nd) { return meshes[nd.id]; }).filter(Boolean);
-
-    var hovId       = -1;
-    var autoRot     = !reduced;
-    var rotY        = 0;
-    var tX = 0, tY = 0, tgX = 0, tgY = 0;
-    var lastCX = 0, lastCY = 0;
-
-    /* ── Zoom état ── */
-    var BASE_Z       = 5.5;
-    var camTarget    = new THREE.Vector3(0, 0, BASE_Z);
-    var zoomedMainId = -1;
-    var zoomMeshes   = [];
-
-    /* Bouton ← Retour */
-    var backBtn = document.createElement('button');
-    backBtn.className = 'globe-back-btn';
-    backBtn.textContent = '← Retour';
-    backBtn.style.display = 'none';
-    container.appendChild(backBtn);
 
     canvas.addEventListener('mousemove', function (e) {
       lastCX = e.clientX;
@@ -545,7 +548,7 @@
     /* ── Boucle de rendu ── */
     function tick() {
       requestAnimationFrame(tick);
-      if (container.clientWidth === 0) return;
+      if (container.offsetWidth === 0) return;
 
       if (!reduced) {
         if (autoRot) rotY += (zoomedMainId >= 0 ? 0.00034 : 0.00068);
@@ -588,20 +591,20 @@
     /* ── Redimensionnement ── */
     if (typeof ResizeObserver !== 'undefined') {
       var ro = new ResizeObserver(function () {
-        var nW = container.clientWidth;
-        var nH = container.clientHeight;
+        var nW = container.offsetWidth;
+        var nH = container.offsetHeight;
         if (nW === 0 || nH === 0) return;
-        renderer.setSize(nW, nH, false);
+        renderer.setSize(nW, nH);
         camera.aspect = nW / nH;
         camera.updateProjectionMatrix();
       });
       ro.observe(container);
     } else {
       window.addEventListener('resize', function () {
-        var nW = container.clientWidth;
-        var nH = container.clientHeight;
+        var nW = container.offsetWidth;
+        var nH = container.offsetHeight;
         if (nW === 0 || nH === 0) return;
-        renderer.setSize(nW, nH, false);
+        renderer.setSize(nW, nH);
         camera.aspect = nW / nH;
         camera.updateProjectionMatrix();
       }, { passive: true });
