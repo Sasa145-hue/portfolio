@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <!-- jsPDF — CV téléchargeable côté client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -48,10 +50,20 @@
   ═══════════════════════════════════ -->
   <header id="site-header">
     <a href="#hero" class="header-logo">SALIF LACAN</a>
-    <button id="mode-btn" aria-label="Changer de mode">
-      <span class="mode-opt" id="opt-pro">PRO</span>
-      <span class="mode-opt" id="opt-perso">PASSION</span>
-    </button>
+    <div class="header-actions">
+      <button class="btn-cv" id="btn-download-cv" aria-label="Télécharger mon CV en PDF">
+        <span>CV</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </button>
+      <button id="mode-btn" aria-label="Changer de mode">
+        <span class="mode-opt" id="opt-pro">PRO</span>
+        <span class="mode-opt" id="opt-perso">PASSION</span>
+      </button>
+    </div>
   </header>
 
   <!-- ═══════════════════════════════════
@@ -657,7 +669,15 @@
           <span class="cc-val cc-small">Véhiculé &mdash; Permis B</span>
         </div>
       </div>
-      <form id="contact-form" class="contact-form reveal" novalidate>
+      <!-- Formspree (ID: mqewgqpo) — valider l'email sur formspree.io lors du premier envoi -->
+      <form id="contact-form" class="contact-form reveal"
+            action="https://formspree.io/f/mqewgqpo"
+            method="POST"
+            novalidate>
+        <!-- Honeypot anti-spam -->
+        <input type="text" name="_gotcha" style="display:none" aria-hidden="true">
+        <input type="hidden" name="_next" value="https://sasa145-hue.github.io/portfolio/?sent=true">
+        <input type="hidden" name="_subject" value="Nouveau message depuis ton portfolio">
         <div class="f-row">
           <div class="f-group">
             <label for="f-name">Nom</label>

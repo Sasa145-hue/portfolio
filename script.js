@@ -47,6 +47,7 @@ function initAll() {
   initModeToggle();
   initToolModal();
   initContactForm();
+  initDownloadCV();
   if (window.__initGlobes) window.__initGlobes();
 }
 
@@ -559,26 +560,216 @@ function initContactForm() {
   const btn = form.querySelector('.btn-send');
 
   form.addEventListener('submit', e => {
-    e.preventDefault();
     const name = form.querySelector('#f-name').value.trim();
     const mail = form.querySelector('#f-email').value.trim();
     const msg  = form.querySelector('#f-msg').value.trim();
-    if (!name || !mail || !msg) return;
+
+    if (!name || !mail || !msg) { e.preventDefault(); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
-      form.querySelector('#f-email').focus(); return;
+      e.preventDefault();
+      form.querySelector('#f-email').focus();
+      return;
     }
 
-    btn.classList.add('is-sent');
-    btn.disabled        = true;
-    btn.style.background = '#4ade80';
-    btn.style.color      = '#fff';
-
-    setTimeout(() => {
-      btn.classList.remove('is-sent');
-      btn.disabled         = false;
-      btn.style.background = '';
-      btn.style.color      = '';
-      form.reset();
-    }, 3500);
+    // Validation OK — feedback visuel, laisser Formspree soumettre
+    btn.disabled = true;
+    btn.style.background = '#8B5CF6';
+    const txt = btn.querySelector('.bs-text');
+    if (txt) txt.textContent = 'Envoi en cours...';
   });
+
+  // Retour après envoi (?sent=true dans l'URL)
+  if (window.location.search.includes('sent=true')) {
+    const lead = document.querySelector('.contact-lead');
+    if (lead) {
+      lead.textContent = 'Message envoyé ! Je te réponds dès que possible.';
+      lead.style.color = '#F59E0B';
+    }
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   CV PDF — jsPDF
+══════════════════════════════════════════════════════════════ */
+function initDownloadCV() {
+  const btn = document.getElementById('btn-download-cv');
+  if (!btn) return;
+  btn.addEventListener('click', generateCV);
+}
+
+function generateCV() {
+  if (!window.jspdf) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const noir   = [10, 10, 10];
+  const violet = [139, 92, 246];
+  const jaune  = [245, 158, 11];
+  const blanc  = [240, 237, 232];
+  const gris   = [136, 136, 136];
+
+  // Fond noir
+  doc.setFillColor(...noir);
+  doc.rect(0, 0, 210, 297, 'F');
+
+  // Bande violet en haut
+  doc.setFillColor(...violet);
+  doc.rect(0, 0, 210, 2, 'F');
+
+  // Nom
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(32);
+  doc.setTextColor(...blanc);
+  doc.text('SALIF LACAN', 20, 28);
+
+  // Titre
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(...violet);
+  doc.text('Marketing Digital · Data & IA · CRM', 20, 37);
+
+  // Ligne séparatrice
+  doc.setDrawColor(...violet);
+  doc.setLineWidth(0.4);
+  doc.line(20, 42, 190, 42);
+
+  // Infos contact
+  doc.setFontSize(8.5);
+  doc.setTextColor(...gris);
+  doc.text('saliflacan00@gmail.com', 20, 49);
+  doc.text('07 88 68 64 21  ·  06 40 56 13 37', 85, 49);
+  doc.text('Bordeaux, 33000  ·  Véhiculé · Permis B', 148, 49);
+
+  // ── Formation ──
+  let y = 60;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(...jaune);
+  doc.text('FORMATION', 20, y);
+  doc.setDrawColor(...jaune);
+  doc.setLineWidth(0.3);
+  doc.line(20, y + 2, 80, y + 2);
+
+  y += 10;
+  const formations = [
+    { badge: 'Bachelor', titre: 'Marketing Digital, Data & IA',             ecole: 'INSEEC — Bordeaux', date: '2024 — 2025' },
+    { badge: 'BTS',      titre: 'Négociation Digitalisation Relation Client', ecole: 'Bordeaux',          date: '2022 — 2024' },
+    { badge: 'Bac',      titre: 'Baccalauréat Général — SES & LLCE',         ecole: 'Bordeaux',          date: '2021 — 2022' },
+  ];
+  formations.forEach(f => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...violet);
+    doc.text(f.badge, 20, y);
+    doc.setTextColor(...blanc);
+    doc.text(f.titre, 40, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...gris);
+    doc.text(f.ecole + '  ·  ' + f.date, 40, y + 5);
+    y += 13;
+  });
+
+  // ── Expériences ──
+  y += 3;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(...jaune);
+  doc.text('EXPÉRIENCES', 20, y);
+  doc.setDrawColor(...jaune);
+  doc.line(20, y + 2, 80, y + 2);
+
+  y += 10;
+  const exps = [
+    {
+      role: 'NDRC — Négociation Digitalisation Relation Client',
+      company: 'Atelier CUB — Mérignac',
+      date: '2022 — 2024  ·  Alternance',
+      missions: [
+        'Gestion relation client et communication multicanal',
+        'Développement stratégies de vente et prospection digitale',
+        'Digitalisation des processus commerciaux internes',
+      ],
+    },
+    {
+      role: 'Marketing Digital & Création Web',
+      company: 'Evasion Gym — Eysines',
+      date: '2022 — 2025  ·  Stage & Bénévolat',
+      missions: [
+        'Création et gestion du site vitrine (CMS)',
+        'Stratégie digitale, réseaux sociaux, analyse performances',
+      ],
+    },
+    {
+      role: 'Stage Télécom',
+      company: "Ericsson — Côte d'Ivoire",
+      date: '2017  ·  Stage',
+      missions: [
+        'Découverte infrastructures télécommunications',
+        'Participation aux opérations techniques réseau',
+      ],
+    },
+  ];
+  exps.forEach(exp => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...blanc);
+    doc.text(exp.role, 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...violet);
+    doc.text(exp.company, 20, y + 5);
+    doc.setTextColor(...gris);
+    doc.text(exp.date, 20, y + 10);
+    y += 15;
+    exp.missions.forEach(m => {
+      doc.setTextColor(...gris);
+      doc.text('—  ' + m, 25, y);
+      y += 5;
+    });
+    y += 5;
+  });
+
+  // ── Compétences ──
+  y += 3;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(...jaune);
+  doc.text('COMPÉTENCES', 20, y);
+  doc.setDrawColor(...jaune);
+  doc.line(20, y + 2, 80, y + 2);
+
+  y += 10;
+  const skills = [
+    { cat: 'Data & Analyse',    items: 'Google Analytics · Power BI · Excel · Reporting · Analyse données' },
+    { cat: 'Marketing Digital', items: 'Meta Ads · SEO · Email Marketing · Community Management · Stratégie digitale' },
+    { cat: 'Outils',            items: 'Microsoft 365 · Figma · Notion · CMS/WordPress · Google Workspace · Canva' },
+    { cat: 'CRM & Vente',       items: 'CRM · Relation client · Vente multicanal · Prospection digitale' },
+    { cat: 'Langues',           items: 'Français natif · Anglais professionnel' },
+  ];
+  skills.forEach(s => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...violet);
+    doc.text(s.cat + ' :', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...blanc);
+    doc.text(s.items, 55, y);
+    y += 7;
+  });
+
+  // Footer
+  doc.setDrawColor(...violet);
+  doc.setLineWidth(0.3);
+  doc.line(20, 285, 190, 285);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...gris);
+  doc.text('Salif Lacan  ·  Marketing Digital & Data  ·  Bordeaux 2025', 105, 291, { align: 'center' });
+
+  // Bande jaune en bas
+  doc.setFillColor(...jaune);
+  doc.rect(0, 295, 210, 2, 'F');
+
+  doc.save('CV_Salif_Lacan.pdf');
 }
