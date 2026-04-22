@@ -519,11 +519,11 @@ body.mode-perso .perso-section { display: block; }
 .tool-logo {
   width: 28px; height: 28px;
   flex-shrink: 0; object-fit: contain;
-  filter: invert(1) brightness(1.4);
+  filter: brightness(0) invert(1);
   transition: filter .65s ease;
 }
 body.mode-perso .tool-logo {
-  filter: invert(15%) sepia(50%) saturate(1600%) hue-rotate(238deg) brightness(55%);
+  filter: brightness(0) sepia(1) saturate(4) hue-rotate(220deg) brightness(0.45);
 }
 
 .tool-logo-gephi {
@@ -890,11 +890,11 @@ textarea { resize: vertical; min-height: 130px; }
 .modal-logo-big {
   width: 52px; height: 52px;
   margin-bottom: 1.25rem; object-fit: contain;
-  filter: invert(1) brightness(1.4);
+  filter: brightness(0) invert(1);
   transition: filter .65s ease;
 }
 body.mode-perso .modal-logo-big {
-  filter: invert(15%) sepia(50%) saturate(1600%) hue-rotate(238deg) brightness(55%);
+  filter: brightness(0) sepia(1) saturate(4) hue-rotate(220deg) brightness(0.45);
 }
 .modal-logo-big[src=""] { display: none; }
 
