@@ -3,45 +3,33 @@
 /* ══════════════════════════════════════════════════════════════
    LOADER
 ══════════════════════════════════════════════════════════════ */
-(function() {
+(function () {
   const loader = document.getElementById('loader');
   const bar    = document.getElementById('loader-bar');
-  const pct    = document.getElementById('loader-percent');
-
+  const pct    = document.getElementById('loader-pct');
   document.body.classList.add('is-loading');
 
-  let progress = 0;
-
-  function step() {
-    const inc = progress < 70
-      ? Math.random() * 14 + 5
-      : progress < 92
-        ? Math.random() * 4 + 1
-        : Math.random() * 1.2 + 0.3;
-
-    progress = Math.min(progress + inc, 100);
-    bar.style.width  = progress + '%';
-    pct.textContent  = Math.round(progress) + '%';
-
-    if (progress < 100) {
-      setTimeout(step, 55 + Math.random() * 65);
-    } else {
-      setTimeout(finishLoader, 320);
-    }
+  let p = 0;
+  function tick() {
+    p += p < 70 ? Math.random() * 13 + 4 : p < 92 ? Math.random() * 3.5 + 1 : Math.random() * 1 + .3;
+    p  = Math.min(p, 100);
+    bar.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+    if (p < 100) setTimeout(tick, 55 + Math.random() * 60);
+    else setTimeout(done, 320);
   }
 
-  function finishLoader() {
+  function done() {
     loader.classList.add('is-done');
     document.body.classList.remove('is-loading');
     initAll();
   }
-
-  setTimeout(step, 100);
+  setTimeout(tick, 100);
 })();
 
 
 /* ══════════════════════════════════════════════════════════════
-   INIT GLOBAL
+   INIT
 ══════════════════════════════════════════════════════════════ */
 function initAll() {
   setYear();
@@ -49,130 +37,273 @@ function initAll() {
   initHeroLines();
   initTagRotation();
   initParallax();
+  initPhotoTilt();
+  initParticles();
+  initLetterSplit();
   initReveal();
+  initSectionWipe();
+  initAproposOrb();
+  initScrollCircle();
   initModeToggle();
+  initToolModal();
   initContactForm();
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER YEAR
+   ANNÉE FOOTER
 ══════════════════════════════════════════════════════════════ */
 function setYear() {
-  const el = document.getElementById('year');
+  const el = document.getElementById('yr');
   if (el) el.textContent = new Date().getFullYear();
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   CURSEUR CARTOON CUSTOM
+   CURSEUR CARTOON — ring avec lag, dot plus rapide
 ══════════════════════════════════════════════════════════════ */
 function initCursor() {
   const cursor = document.getElementById('cursor');
   if (!cursor) return;
 
-  /* Sur mobile/tactile, on cache le curseur custom */
+  /* Masquer sur tactile */
   if (window.matchMedia('(pointer: coarse)').matches) {
     cursor.style.display = 'none';
-    document.body.style.cursor = 'auto';
-    document.querySelectorAll('*').forEach(el => el.style.cursor = '');
     return;
   }
 
   const ring = cursor.querySelector('.cursor-ring');
   const dot  = cursor.querySelector('.cursor-dot');
 
-  let mx = -100, my = -100; // position cible souris
-  let rx = -100, ry = -100; // position réelle du ring (lag)
-  let dx = -100, dy = -100; // position réelle du dot (plus rapide)
+  let mx = -200, my = -200;
+  let rx = -200, ry = -200; /* position ring (lag) */
+  let dx = -200, dy = -200; /* position dot (rapide) */
 
-  /* Lag du ring : 0.1 = plus lent/cartoon, dot : 0.25 */
-  const RING_EASE = 0.1;
-  const DOT_EASE  = 0.3;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX;
-    my = e.clientY;
-  });
+  (function loop() {
+    /* Dot suit rapidement, ring lag en arrière = effet cartoon */
+    dx += (mx - dx) * 0.28;
+    dy += (my - dy) * 0.28;
+    rx += (mx - rx) * 0.1;
+    ry += (my - ry) * 0.1;
 
-  function loop() {
-    rx += (mx - rx) * RING_EASE;
-    ry += (my - ry) * RING_EASE;
-    dx += (mx - dx) * DOT_EASE;
-    dy += (my - dy) * DOT_EASE;
-
-    cursor.style.transform = `translate(${dx}px, ${dy}px)`;
-    ring.style.transform   = `translate(${rx - dx}px, ${ry - dy}px) translate(-50%, -50%)`;
-    dot.style.transform    = `translate(-50%, -50%)`;
+    /* Dot : position exacte de la souris */
+    dot.style.transform  = `translate(${dx}px, ${dy}px) translate(-50%,-50%)`;
+    /* Ring : position retardée */
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
 
     requestAnimationFrame(loop);
-  }
-  loop();
+  })();
 
   /* Hover sur interactifs */
-  document.addEventListener('mouseover', (e) => {
-    if (e.target.closest('a, button, input, textarea, [role="button"]')) {
-      document.body.classList.add('cursor-hover');
-    }
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('a,button,input,textarea,[role=button]'))
+      document.body.classList.add('cur-hover');
   });
-  document.addEventListener('mouseout', (e) => {
-    if (e.target.closest('a, button, input, textarea, [role="button"]')) {
-      document.body.classList.remove('cursor-hover');
-    }
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('a,button,input,textarea,[role=button]'))
+      document.body.classList.remove('cur-hover');
   });
 
-  /* Click press */
-  document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-  document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
-
-  /* Masquer quand la souris quitte la fenêtre */
+  document.addEventListener('mousedown', () => document.body.classList.add('cur-click'));
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cur-click'));
   document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
   document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   HERO — LIGNES TITRE
+   PHOTO — TILT 3D + GLARE + FLOAT
+══════════════════════════════════════════════════════════════ */
+function initPhotoTilt() {
+  const ring  = document.getElementById('photo-ring');
+  const tilt  = document.getElementById('photo-tilt');
+  const glare = document.getElementById('photo-glare');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!ring || !tilt || window.matchMedia('(pointer: coarse)').matches) return;
+  /* En reduced motion, juste garder le float sans tilt ni glare */
+
+  /* Float JS (remplace animation CSS floatY) */
+  let floatT = 0;
+  let tiltX = 0, tiltY = 0;
+  let targetTX = 0, targetTY = 0;
+  let isHovered = false;
+
+  (function floatLoop() {
+    floatT += 0.012;
+    const floatY = Math.sin(floatT) * 14;
+
+    /* Interpolation douce vers la cible tilt */
+    tiltX += (targetTX - tiltX) * 0.08;
+    tiltY += (targetTY - tiltY) * 0.08;
+
+    ring.style.transform = `translateY(${floatY}px) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+
+    /* Ombre dynamique simulant la lumière */
+    const sx = -tiltY * 1.8;
+    const sy =  tiltX * 1.8;
+    ring.style.boxShadow = `${sx}px ${sy}px 40px var(--accent-glow), 0 0 0 10px var(--accent-soft), 0 0 70px var(--accent-glow)`;
+
+    requestAnimationFrame(floatLoop);
+  })();
+
+  if (!reduced) {
+    ring.addEventListener('mousemove', e => {
+      const rect = ring.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width  / 2) / (rect.width  / 2);
+      const y = (e.clientY - rect.top  - rect.height / 2) / (rect.height / 2);
+      targetTY =  x * 13;
+      targetTX = -y * 13;
+      if (glare) {
+        const gx = ((x + 1) / 2 * 100).toFixed(1);
+        const gy = ((y + 1) / 2 * 100).toFixed(1);
+        glare.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.22) 0%, transparent 60%)`;
+      }
+    });
+    ring.addEventListener('mouseleave', () => {
+      targetTX = 0; targetTY = 0;
+      if (glare) glare.style.background = '';
+    });
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   HERO — PARTICULES FLOTTANTES
+══════════════════════════════════════════════════════════════ */
+function initParticles() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  const container = document.createElement('div');
+  container.className = 'hero-particles';
+  hero.insertBefore(container, hero.firstChild);
+
+  const count = 7;
+  const particles = [];
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 100}%;
+      opacity:${Math.random() * 0.45 + 0.1};
+    `;
+    container.appendChild(p);
+    particles.push({
+      el: p,
+      x: parseFloat(p.style.left),
+      y: parseFloat(p.style.top),
+      vx: (Math.random() - 0.5) * 0.018,
+      vy: (Math.random() - 0.5) * 0.012,
+    });
+  }
+
+  (function drift() {
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -2)  p.x = 102;
+      if (p.x > 102) p.x = -2;
+      if (p.y < -2)  p.y = 102;
+      if (p.y > 102) p.y = -2;
+      p.el.style.left = p.x + '%';
+      p.el.style.top  = p.y + '%';
+    });
+    requestAnimationFrame(drift);
+  })();
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   WIPE DIAGONAL — sections section-alt
+══════════════════════════════════════════════════════════════ */
+function initSectionWipe() {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.section-alt').forEach(el => el.classList.add('diag-visible'));
+    return;
+  }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('diag-visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.section-alt').forEach(el => obs.observe(el));
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   À PROPOS — expansion orbe
+══════════════════════════════════════════════════════════════ */
+function initAproposOrb() {
+  const section = document.getElementById('apropos');
+  if (!section) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        section.classList.add('is-expanded');
+        obs.unobserve(section);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  obs.observe(section);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   HERO — ANIMATION DES LIGNES (clip-path wipe)
 ══════════════════════════════════════════════════════════════ */
 function initHeroLines() {
   document.querySelectorAll('.hero-name .line').forEach(line => {
     const delay = parseInt(line.dataset.delay || '0', 10);
     setTimeout(() => line.classList.add('is-visible'), delay);
   });
+
+  /* Reveal bio + CTA */
+  setTimeout(() => {
+    document.querySelectorAll('.reveal-h').forEach(el => el.classList.add('is-visible'));
+  }, 700);
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   HERO — ROTATION DE TAGS
+   HERO — ROTATION DES TAGS
 ══════════════════════════════════════════════════════════════ */
 function initTagRotation() {
-  function rotateSet(container) {
-    const tags = container ? container.querySelectorAll('.tag') : [];
+  function rotate(containerSelector) {
+    const tags = document.querySelectorAll(containerSelector + ' .tag');
     if (tags.length < 2) return null;
-    let current = 0;
+    let i = 0;
     return setInterval(() => {
-      tags[current].classList.remove('active');
-      current = (current + 1) % tags.length;
-      tags[current].classList.add('active');
-    }, 2600);
+      tags[i].classList.remove('active');
+      i = (i + 1) % tags.length;
+      tags[i].classList.add('active');
+    }, 2500);
   }
 
-  let timerPro   = rotateSet(document.querySelector('.hero-tags-pro'));
-  let timerPerso = rotateSet(document.querySelector('.hero-tags-perso'));
+  let t1 = rotate('.tags-pro');
+  let t2 = rotate('.tags-perso');
 
-  /* Reset les timers quand le mode change */
-  document.getElementById('mode-btn').addEventListener('click', () => {
-    clearInterval(timerPro);
-    clearInterval(timerPerso);
-
-    /* Reset active states */
+  /* Reset au switch de mode */
+  window.__resetTags = () => {
+    clearInterval(t1); clearInterval(t2);
     document.querySelectorAll('.hero-tags .tag').forEach((t, i) => {
       t.classList.toggle('active', i === 0);
     });
-
-    timerPro   = rotateSet(document.querySelector('.hero-tags-pro'));
-    timerPerso = rotateSet(document.querySelector('.hero-tags-perso'));
-  });
+    t1 = rotate('.tags-pro');
+    t2 = rotate('.tags-perso');
+  };
 }
 
 
@@ -180,46 +311,37 @@ function initTagRotation() {
    HERO — PARALLAX SOURIS
 ══════════════════════════════════════════════════════════════ */
 function initParallax() {
-  const hero   = document.querySelector('.hero');
+  const hero = document.querySelector('.hero');
   if (!hero) return;
 
-  /* Éléments avec data-depth */
-  const parallaxEls = hero.querySelectorAll('[data-depth]');
-
-  let cx = window.innerWidth  / 2;
+  const els = hero.querySelectorAll('[data-depth]');
+  let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
 
-  /* Recalcule le centre si resize */
   window.addEventListener('resize', () => {
-    cx = window.innerWidth  / 2;
+    cx = window.innerWidth / 2;
     cy = window.innerHeight / 2;
   }, { passive: true });
 
   let ticking = false;
-
-  hero.addEventListener('mousemove', (e) => {
+  hero.addEventListener('mousemove', e => {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      const dx = (e.clientX - cx) / cx; // -1 → 1
-      const dy = (e.clientY - cy) / cy; // -1 → 1
-
-      parallaxEls.forEach(el => {
-        const depth = parseFloat(el.dataset.depth);
-        const tx = dx * depth * 40;
-        const ty = dy * depth * 28;
-        el.style.transform = `translate(${tx}px, ${ty}px)`;
+      const dx = (e.clientX - cx) / cx;
+      const dy = (e.clientY - cy) / cy;
+      els.forEach(el => {
+        const d  = parseFloat(el.dataset.depth);
+        el.style.transform = `translate(${dx * d * 90}px, ${dy * d * 65}px)`;
       });
-
       ticking = false;
     });
   });
 
-  /* Retour doux au centre quand la souris quitte le hero */
   hero.addEventListener('mouseleave', () => {
-    parallaxEls.forEach(el => {
+    els.forEach(el => {
       el.style.transition = 'transform 1.2s ease';
-      el.style.transform  = 'translate(0, 0)';
+      el.style.transform  = 'translate(0,0)';
       setTimeout(() => { el.style.transition = ''; }, 1200);
     });
   });
@@ -235,92 +357,219 @@ function initReveal() {
     return;
   }
 
-  /* Stagger sur les grilles */
+  /* Stagger */
   [
-    { sel: '.tl-item',       step: 80  },
-    { sel: '.skill-cat',     step: 70  },
-    { sel: '.passion-card',  step: 80  },
-    { sel: '.projet-card',   step: 90  },
-    { sel: '.contact-card',  step: 60  },
-  ].forEach(({ sel, step }) => {
-    document.querySelectorAll(sel).forEach((el, i) => {
+    { s: '.tl',          step: 90  },
+    { s: '.tool-cat',    step: 80  },
+    { s: '.passion-card',step: 80  },
+    { s: '.cc',          step: 60  },
+  ].forEach(({ s, step }) => {
+    document.querySelectorAll(s).forEach((el, i) => {
       el.style.transitionDelay = (i * step) + 'ms';
     });
   });
 
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-visible');
+        obs.unobserve(e.target);
       }
     });
   }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  document.querySelectorAll('.reveal:not(.split-applied)').forEach(el => obs.observe(el));
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   BOUTON MODE PRO / PERSO
+   CERCLE DE SCROLL DYNAMIQUE
 ══════════════════════════════════════════════════════════════ */
-function initModeToggle() {
-  const btn = document.getElementById('mode-btn');
-  if (!btn) return;
+function initScrollCircle() {
+  const fill = document.getElementById('scroll-ring-fill');
+  if (!fill) return;
+  const circ = 100.53; /* 2π × 16 */
 
-  btn.addEventListener('click', () => {
-    const isPerso = document.body.classList.toggle('mode-perso');
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+    fill.style.strokeDashoffset = circ * (1 - pct);
+  }, { passive: true });
+}
 
-    /* Re-trigger les reveals dans le nouveau contenu visible */
-    setTimeout(() => {
-      document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.92) {
-          el.classList.add('is-visible');
-        }
+
+/* ══════════════════════════════════════════════════════════════
+   ANIMATION LETTRE PAR LETTRE — titres de section
+══════════════════════════════════════════════════════════════ */
+function initLetterSplit() {
+  if (!('IntersectionObserver' in window)) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      obs.unobserve(entry.target);
+      entry.target.querySelectorAll('.char').forEach((c, i) => {
+        setTimeout(() => c.classList.add('is-visible'), i * 38);
       });
-    }, 50);
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.s-title').forEach(el => {
+    const text = el.textContent;
+    el.innerHTML = [...text].map(ch => {
+      const s = document.createElement('span');
+      s.className = 'char';
+      s.textContent = ch === ' ' ? ' ' : ch;
+      return s.outerHTML;
+    }).join('');
+    el.classList.add('split-applied');
+    /* Reset les styles hérités de .reveal */
+    el.style.opacity  = '1';
+    el.style.transform = 'none';
+    obs.observe(el);
   });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   FORMULAIRE DE CONTACT
+   MODE TOGGLE — PRO / PASSION avec rideau de couleur
+══════════════════════════════════════════════════════════════ */
+function initModeToggle() {
+  const btn     = document.getElementById('mode-btn');
+  const optPro  = document.getElementById('opt-pro');
+  const optPerso = document.getElementById('opt-perso');
+  const curtain = document.getElementById('curtain');
+  if (!btn) return;
+
+  optPro.classList.add('is-active');
+
+  let busy = false;
+
+  btn.addEventListener('click', () => {
+    if (busy) return;
+    busy = true;
+
+    const goingPerso = !document.body.classList.contains('mode-perso');
+    const outSels = goingPerso ? '.pro-section'   : '.perso-section';
+    const inSels  = goingPerso ? '.perso-section' : '.pro-section';
+
+    /* 1. Rideau entre de gauche */
+    curtain.style.transition = 'transform .38s cubic-bezier(0.77,0,0.175,1)';
+    curtain.style.transformOrigin = 'left center';
+    curtain.style.transform = 'scaleX(1)';
+
+    setTimeout(() => {
+      /* 2. Tout switcher derrière le rideau */
+      document.body.classList.toggle('mode-perso');
+
+      document.querySelectorAll(outSels).forEach(el => { el.style.display = 'none'; });
+      document.querySelectorAll(inSels).forEach(el  => {
+        el.style.display = 'block';
+        /* Re-déclencher le wipe diagonal si pas encore visible */
+        if (el.classList.contains('section-alt') && !el.classList.contains('diag-visible')) {
+          requestAnimationFrame(() => el.classList.add('diag-visible'));
+        }
+        /* Re-déclencher l'orbe à propos */
+        if (el.id === 'apropos' && !el.classList.contains('is-expanded')) {
+          setTimeout(() => el.classList.add('is-expanded'), 150);
+        }
+      });
+
+      optPro.classList.toggle('is-active',   !goingPerso);
+      optPerso.classList.toggle('is-active',  goingPerso);
+
+      if (window.__resetTags) window.__resetTags();
+
+      document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.92)
+          el.classList.add('is-visible');
+      });
+
+      /* 3. Rideau sort par la droite */
+      curtain.style.transformOrigin = 'right center';
+      curtain.style.transform = 'scaleX(0)';
+
+      setTimeout(() => { busy = false; }, 400);
+    }, 400);
+  });
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   MODAL OUTIL
+══════════════════════════════════════════════════════════════ */
+function initToolModal() {
+  const modal      = document.getElementById('tool-modal');
+  const modalBg    = document.getElementById('modal-bg');
+  const modalClose = document.getElementById('modal-close');
+  const modalLogo  = document.getElementById('modal-logo');
+  const modalName  = document.getElementById('modal-name');
+  const modalShort = document.getElementById('modal-short');
+  const modalLong  = document.getElementById('modal-long');
+  const modalUrl   = document.getElementById('modal-url');
+  if (!modal) return;
+
+  function openModal(btn) {
+    const logo = btn.dataset.logo || '';
+    const url  = btn.dataset.url  || '';
+    modalLogo.src           = logo;
+    modalLogo.style.display = logo ? '' : 'none';
+    modalName.textContent   = btn.dataset.name  || '';
+    modalShort.innerHTML    = btn.dataset.short || '';
+    modalLong.innerHTML     = btn.dataset.long  || '';
+    if (url) { modalUrl.href = url; modalUrl.hidden = false; }
+    else      { modalUrl.hidden = true; }
+    modal.hidden              = false;
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.tool-item').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn));
+  });
+
+  modalClose.addEventListener('click', closeModal);
+  modalBg.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !modal.hidden) closeModal();
+  });
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   FORMULAIRE CONTACT
 ══════════════════════════════════════════════════════════════ */
 function initContactForm() {
   const form = document.getElementById('contact-form');
   if (!form) return;
+  const btn = form.querySelector('.btn-send');
 
-  const btn = form.querySelector('.btn-submit');
-
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', e => {
     e.preventDefault();
-
-    const name    = form.querySelector('#name').value.trim();
-    const email   = form.querySelector('#email').value.trim();
-    const message = form.querySelector('#message').value.trim();
-
-    if (!name || !email || !message) return;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      form.querySelector('#email').focus();
-      return;
+    const name = form.querySelector('#f-name').value.trim();
+    const mail = form.querySelector('#f-email').value.trim();
+    const msg  = form.querySelector('#f-msg').value.trim();
+    if (!name || !mail || !msg) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+      form.querySelector('#f-email').focus(); return;
     }
 
     btn.classList.add('is-sent');
-    btn.disabled = true;
+    btn.disabled        = true;
     btn.style.background = '#4ade80';
+    btn.style.color      = '#fff';
 
     setTimeout(() => {
       btn.classList.remove('is-sent');
       btn.disabled         = false;
       btn.style.background = '';
+      btn.style.color      = '';
       form.reset();
     }, 3500);
-
-    /*
-      Connecter ici votre service d'envoi :
-      fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ name, email, message }) })
-    */
   });
 }

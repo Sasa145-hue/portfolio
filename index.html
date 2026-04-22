@@ -5,71 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Salif Lacan — Marketing Digital & Data</title>
   <meta name="description" content="Salif Lacan — Bachelor Marketing Digital, Data & IA, Bordeaux.">
-  <meta name="theme-color" content="#0c0a18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ─ CURSEUR CUSTOM ─────────────────────── -->
+  <!-- CURSEUR -->
   <div id="cursor" aria-hidden="true">
     <div class="cursor-ring"></div>
     <div class="cursor-dot"></div>
   </div>
 
-  <!-- ─ LOADER ─────────────────────────────── -->
-  <div id="loader" role="status" aria-label="Chargement">
-    <div class="loader-inner">
-      <div class="loader-name">SALIF LACAN</div>
-      <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
-      <div class="loader-percent" id="loader-percent">0%</div>
+  <!-- RIDEAU DE TRANSITION -->
+  <div id="curtain" aria-hidden="true"></div>
+
+  <!-- MODAL OUTIL -->
+  <div id="tool-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-name">
+    <div class="modal-bg" id="modal-bg"></div>
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close" aria-label="Fermer">&times;</button>
+      <img id="modal-logo" class="modal-logo-big" src="" alt="" loading="lazy">
+      <h3 id="modal-name" class="modal-tool-name"></h3>
+      <p id="modal-short" class="modal-short"></p>
+      <p id="modal-long" class="modal-long"></p>
+      <a id="modal-url" class="modal-url" href="#" target="_blank" rel="noopener">Voir le site officiel →</a>
     </div>
   </div>
 
-  <!-- ─ BOUTON MODE FLOTTANT ────────────────── -->
-  <button id="mode-btn" aria-label="Changer de mode" title="Changer de mode">
-    <span class="mode-btn-track">
-      <span class="mode-label to-perso">MOI</span>
-      <span class="mode-label to-pro">PRO</span>
-    </span>
-  </button>
+  <!-- LOADER -->
+  <div id="loader" role="status">
+    <div class="loader-inner">
+      <p class="loader-name">SALIF LACAN</p>
+      <div class="loader-bar-wrap"><div id="loader-bar" class="loader-bar"></div></div>
+      <p class="loader-pct" id="loader-pct">0%</p>
+    </div>
+  </div>
 
-  <!-- ══════════════════════════════════════════
+  <!-- ═══════════════════════════════════
+       HEADER
+  ═══════════════════════════════════ -->
+  <header id="site-header">
+    <a href="#hero" class="header-logo">SALIF LACAN</a>
+    <button id="mode-btn" aria-label="Changer de mode">
+      <span class="mode-opt" id="opt-pro">PRO</span>
+      <span class="mode-opt" id="opt-perso">PASSION</span>
+    </button>
+  </header>
+
+  <!-- ═══════════════════════════════════
        HERO
-  ══════════════════════════════════════════ -->
+  ═══════════════════════════════════ -->
   <section id="hero" class="hero">
-
-    <!-- blobs décoratifs (parallax) -->
-    <div class="blob blob-1" data-depth="0.06" aria-hidden="true"></div>
-    <div class="blob blob-2" data-depth="0.03" aria-hidden="true"></div>
-    <div class="blob blob-3" data-depth="0.08" aria-hidden="true"></div>
+    <div class="blob b1" data-depth="0.06" aria-hidden="true"></div>
+    <div class="blob b2" data-depth="0.04" aria-hidden="true"></div>
 
     <div class="hero-inner">
-
-      <!-- Photo -->
-      <div class="hero-photo-wrap" data-depth="0.05">
-        <!-- Sauvegarde ta photo sous assets/photo.jpg -->
-        <div class="hero-photo-ring">
-          <img src="assets/photo.jpg" alt="Salif Lacan" class="hero-photo" width="320" height="320">
-        </div>
-        <div class="hero-photo-glow" aria-hidden="true"></div>
-      </div>
-
-      <!-- Texte -->
-      <div class="hero-copy" data-depth="-0.025">
-
-        <!-- tags PRO -->
-        <div class="hero-tags hero-tags-pro">
+      <!-- Texte gauche -->
+      <div class="hero-copy" data-depth="-0.02">
+        <div class="hero-tags tags-pro">
           <span class="tag active">DATA &amp; IA</span>
           <span class="tag">MARKETING DIGITAL</span>
           <span class="tag">CRM</span>
           <span class="tag">GESTION CMS</span>
-          <span class="tag">DIGITALISATION</span>
         </div>
-        <!-- tags PERSO -->
-        <div class="hero-tags hero-tags-perso">
+        <div class="hero-tags tags-perso">
           <span class="tag active">BASKET COACH</span>
           <span class="tag">GUITARISTE</span>
           <span class="tag">GAMER &amp; TECH</span>
@@ -77,321 +78,556 @@
         </div>
 
         <h1 class="hero-name">
-          <span class="line" data-delay="200">SALIF</span>
-          <span class="line" data-delay="340">LACAN</span>
+          <span class="line" data-delay="300">SALIF</span>
+          <span class="line" data-delay="460">LACAN</span>
         </h1>
 
-        <p class="hero-sub hero-sub-pro">
-          Bachelor Marketing Digital, Data &amp; IA &mdash; Bordeaux
-        </p>
-        <p class="hero-sub hero-sub-perso">
-          22 ans, Bordeaux &mdash; Passionné de tech &amp; de digital
-        </p>
+        <p class="hero-sub sub-pro">Bachelor Marketing Digital, Data &amp; IA &mdash; Bordeaux</p>
+        <p class="hero-sub sub-perso">22 ans &mdash; Bordeaux &mdash; Passionné de tech &amp; digital</p>
 
-        <p class="hero-bio">
-          Passionné par la technologie, l'innovation et le digital.
-          Je transforme ma curiosité en expertise pratique.
-        </p>
+        <p class="hero-bio reveal-h">Passionné par la technologie, l'innovation et le digital. Je transforme ma curiosité en expertise pratique en relevant des défis techniques variés.</p>
 
-        <div class="hero-cta">
-          <a href="mailto:saliflacan00@gmail.com" class="cta-btn">saliflacan00@gmail.com</a>
-          <a href="tel:+33788686421" class="cta-btn cta-btn--ghost">07 88 68 64 21</a>
+        <div class="hero-cta reveal-h">
+          <a href="mailto:saliflacan00@gmail.com" class="btn-hero">saliflacan00@gmail.com</a>
+          <a href="tel:+33788686421" class="btn-hero btn-ghost">07 88 68 64 21</a>
         </div>
+      </div>
 
+      <!-- Photo droite -->
+      <div class="hero-photo-wrap" data-depth="0.05">
+        <div class="hero-photo-ring" id="photo-ring">
+          <div class="photo-tilt-inner" id="photo-tilt">
+            <img id="hero-img" src="photo.jpg" alt="Salif Lacan"
+                 class="hero-photo"
+                 onerror="this.style.display='none';document.getElementById('photo-fallback').style.display='flex'">
+            <div id="photo-fallback" class="photo-fallback">SL</div>
+          </div>
+          <div class="photo-glare" id="photo-glare" aria-hidden="true"></div>
+        </div>
+        <div class="photo-glow" aria-hidden="true"></div>
       </div>
     </div>
 
     <div class="scroll-hint" aria-hidden="true">
-      <span>Défiler</span>
-      <div class="scroll-line"></div>
+      <svg class="scroll-ring" viewBox="0 0 40 40">
+        <circle class="scroll-ring-bg" cx="20" cy="20" r="16"/>
+        <circle class="scroll-ring-fill" id="scroll-ring-fill" cx="20" cy="20" r="16"/>
+      </svg>
+      <span class="scroll-label">scroll</span>
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════
-       PARCOURS (01)
-  ══════════════════════════════════════════ -->
-  <section id="parcours" class="section">
-    <div class="section-head">
-      <span class="section-num">01</span>
-      <h2 class="section-title reveal">Parcours</h2>
-    </div>
 
+  <!-- ═══════════════════════════════════
+       GLOBE 3D — PRO
+  ═══════════════════════════════════ -->
+  <section id="globe-pro" class="globe-section pro-section" aria-label="Globe de compétences professionnelles">
+    <p class="globe-invite" aria-hidden="true">Survolez pour explorer mes compétences</p>
+    <canvas class="globe-canvas" aria-hidden="true"></canvas>
+    <div class="globe-tooltip" role="tooltip"></div>
+    <div class="globe-panel" hidden>
+      <button class="globe-panel-close" aria-label="Fermer">×</button>
+      <h3 class="globe-panel-title"></h3>
+      <ul class="globe-panel-list"></ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════
+       GLOBE 3D — PASSION
+  ═══════════════════════════════════ -->
+  <section id="globe-perso" class="globe-section perso-section" aria-label="Globe de passions personnelles">
+    <p class="globe-invite" aria-hidden="true">Survolez pour découvrir mes passions</p>
+    <canvas class="globe-canvas" aria-hidden="true"></canvas>
+    <div class="globe-tooltip" role="tooltip"></div>
+    <div class="globe-panel" hidden>
+      <button class="globe-panel-close" aria-label="Fermer">×</button>
+      <h3 class="globe-panel-title"></h3>
+      <ul class="globe-panel-list"></ul>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════
+       PRO — PARCOURS
+  ═══════════════════════════════════ -->
+  <section id="parcours" class="section pro-section">
+    <div class="s-head">
+      <span class="s-num">01</span>
+      <h2 class="s-title reveal">Parcours</h2>
+    </div>
     <div class="parcours-grid">
 
-      <!-- Formation -->
-      <div class="parcours-col reveal">
-        <h3 class="col-title">Formation</h3>
-        <ol class="timeline" reversed>
-
-          <li class="tl-item">
+      <div class="p-col reveal">
+        <h3 class="col-ttl">Formation</h3>
+        <ol class="timeline">
+          <li class="tl">
             <div class="tl-dot"></div>
             <time class="tl-date">2024 — 2025</time>
             <h4 class="tl-role">Bachelor Marketing Digital, Data &amp; IA</h4>
             <p class="tl-org">INSEEC &mdash; Bordeaux</p>
           </li>
-
-          <li class="tl-item">
+          <li class="tl">
             <div class="tl-dot"></div>
             <time class="tl-date">2022 — 2024</time>
             <h4 class="tl-role">BTS Négociations Digitalisation Relation Client</h4>
             <p class="tl-org">Bordeaux</p>
           </li>
-
-          <li class="tl-item">
+          <li class="tl">
             <div class="tl-dot"></div>
             <time class="tl-date">2021 — 2022</time>
-            <h4 class="tl-role">Baccalauréat Général SES &amp; LLCE</h4>
+            <h4 class="tl-role">Baccalauréat Général &mdash; SES &amp; LLCE</h4>
             <p class="tl-org">Bordeaux</p>
           </li>
-
         </ol>
       </div>
 
-      <!-- Expériences -->
-      <div class="parcours-col reveal">
-        <h3 class="col-title">Expériences</h3>
-        <ol class="timeline" reversed>
-
-          <li class="tl-item">
+      <div class="p-col reveal">
+        <h3 class="col-ttl">Expériences</h3>
+        <ol class="timeline">
+          <li class="tl">
             <div class="tl-dot"></div>
             <time class="tl-date">2022 — 2024</time>
             <h4 class="tl-role">Alternance NDRC</h4>
             <p class="tl-org">Atelier CUB &mdash; Mérignac</p>
-            <ul class="tl-missions">
-              <li>Relation client &amp; vente multicanal</li>
-              <li>Digitalisation des processus commerciaux</li>
-              <li>Stratégie digitale &amp; CMS</li>
+            <ul class="tl-detail">
+              <li>Prospection commerciale et développement du portefeuille client</li>
+              <li>Gestion de la relation client via HubSpot CRM (téléphone, email, présentiel)</li>
+              <li>Digitalisation des processus commerciaux internes</li>
+              <li>Création de supports digitaux et animation des réseaux sociaux</li>
+              <li>Reporting hebdomadaire et analyse des KPIs commerciaux</li>
             </ul>
           </li>
-
-          <li class="tl-item">
+          <li class="tl">
             <div class="tl-dot"></div>
             <time class="tl-date">2022 — 2025</time>
-            <h4 class="tl-role">Stage &amp; Bénévolat Marketing Digital</h4>
+            <h4 class="tl-role">Marketing Digital &amp; Création Web</h4>
             <p class="tl-org">Evasion Gym &mdash; Eysines</p>
-            <ul class="tl-missions">
-              <li>Création du site vitrine (CMS)</li>
-              <li>Animation réseaux sociaux</li>
-              <li>Suivi des performances &amp; analytics</li>
+            <ul class="tl-detail">
+              <li>Création et gestion du site vitrine sous WordPress</li>
+              <li>Mise en place de la stratégie de présence digitale du club</li>
+              <li>Production de contenu vidéo (réels Instagram) avec DaVinci Resolve</li>
+              <li>Suivi du trafic via Google Analytics &amp; Search Console</li>
+              <li>Campagnes Meta Ads pour la promotion des abonnements</li>
             </ul>
           </li>
-
-          <li class="tl-item">
+          <li class="tl">
             <div class="tl-dot"></div>
             <time class="tl-date">2017</time>
             <h4 class="tl-role">Stage Télécom</h4>
             <p class="tl-org">Ericsson &mdash; Côte d'Ivoire</p>
-            <ul class="tl-missions">
-              <li>Découverte des infrastructures télécoms</li>
-              <li>Initiation aux environnements tech professionnels</li>
+            <ul class="tl-detail">
+              <li>Découverte des infrastructures télécommunications mobiles</li>
+              <li>Initiation aux environnements technologiques à grande échelle</li>
+              <li>Observation des opérations de maintenance réseau</li>
             </ul>
           </li>
-
         </ol>
       </div>
 
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════
-       COMPÉTENCES / PASSIONS (02)
-  ══════════════════════════════════════════ -->
-  <section id="competences" class="section section-alt">
-    <div class="section-head">
-      <span class="section-num">02</span>
-      <h2 class="section-title reveal">
-        <span class="label-pro">Compétences</span>
-        <span class="label-perso">Passions</span>
-      </h2>
+
+  <!-- ═══════════════════════════════════
+       PRO — LOGICIELS (cliquables)
+  ═══════════════════════════════════ -->
+  <section id="logiciels" class="section section-alt pro-section">
+    <div class="s-head">
+      <span class="s-num">02</span>
+      <h2 class="s-title reveal">Outils &amp; Logiciels</h2>
+    </div>
+    <p class="tools-hint reveal">Clique sur un outil pour en savoir plus</p>
+
+    <div class="tools-grid">
+
+      <div class="tool-cat reveal">
+        <h3 class="tool-cat-title">CMS &amp; E-commerce</h3>
+        <div class="tool-list">
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/wordpress"
+            data-name="WordPress"
+            data-url="https://wordpress.org"
+            data-short="Création &amp; gestion de sites vitrines et blogs"
+            data-long="Utilisé chez Evasion Gym pour créer et gérer le site vitrine. Maîtrise des thèmes, plugins SEO (Yoast), Elementor et administration complète du back-office.">
+            <img src="https://cdn.simpleicons.org/wordpress" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">WordPress</span>
+              <span class="tool-desc">Sites vitrines &amp; blogs</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/drupal"
+            data-name="Drupal"
+            data-url="https://drupal.org"
+            data-short="CMS avancé pour sites institutionnels complexes"
+            data-long="CMS open-source pour projets à fort volume de contenu. Gestion avancée des modules, taxonomies et permissions multi-utilisateurs. Utilisé en formation Bachelor.">
+            <img src="https://cdn.simpleicons.org/drupal" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Drupal</span>
+              <span class="tool-desc">Sites institutionnels complexes</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/wix"
+            data-name="Wix"
+            data-url="https://wix.com"
+            data-short="Création de sites par drag-and-drop"
+            data-long="Création rapide de sites vitrines pour des projets clients avec des délais courts. Personnalisation visuelle avancée sans code grâce aux templates Wix.">
+            <img src="https://cdn.simpleicons.org/wix" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Wix</span>
+              <span class="tool-desc">Création drag-and-drop</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/prestashop"
+            data-name="PrestaShop"
+            data-url="https://prestashop.com"
+            data-short="Gestion de boutiques e-commerce"
+            data-long="Solution e-commerce open-source. Gestion de catalogues produits, modules de paiement, suivi des commandes et tableaux de bord des ventes.">
+            <img src="https://cdn.simpleicons.org/prestashop" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">PrestaShop</span>
+              <span class="tool-desc">E-commerce open-source</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-cat reveal">
+        <h3 class="tool-cat-title">Data &amp; Analytics</h3>
+        <div class="tool-list">
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/googleanalytics"
+            data-name="Google Analytics 4"
+            data-url="https://analytics.google.com"
+            data-short="Suivi &amp; analyse du trafic web"
+            data-long="Utilisé chez Evasion Gym pour analyser le comportement des visiteurs. Configuration des événements, objectifs de conversion et rapports personnalisés.">
+            <img src="https://cdn.simpleicons.org/googleanalytics" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Google Analytics 4</span>
+              <span class="tool-desc">Suivi &amp; analyse du trafic</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/googlesearchconsole"
+            data-name="Google Search Console"
+            data-url="https://search.google.com/search-console"
+            data-short="Optimisation SEO &amp; performances de recherche"
+            data-long="Analyse des performances SEO, indexation des pages, correction des erreurs techniques et suivi des requêtes qui amènent du trafic organique.">
+            <img src="https://cdn.simpleicons.org/googlesearchconsole" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Google Search Console</span>
+              <span class="tool-desc">SEO &amp; performances Google</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/microsoftpowerbi"
+            data-name="Power BI"
+            data-url="https://powerbi.microsoft.com"
+            data-short="Visualisation &amp; reporting de données"
+            data-long="Création de rapports et tableaux de bord interactifs pour la visualisation de données business. Connexion à des sources multiples (Excel, SQL, API).">
+            <img src="https://cdn.simpleicons.org/microsoftpowerbi" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Power BI</span>
+              <span class="tool-desc">Dashboards &amp; reporting</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/lookerstudio"
+            data-name="Looker Studio"
+            data-url="https://lookerstudio.google.com"
+            data-short="Tableaux de bord marketing Google"
+            data-long="Connexion aux sources de données Google (GA4, Ads, Sheets) pour créer des dashboards marketing automatisés, visuels et partageables avec les clients.">
+            <img src="https://cdn.simpleicons.org/lookerstudio" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Looker Studio</span>
+              <span class="tool-desc">Dashboards Google interconnectés</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo=""
+            data-name="Gephi"
+            data-url="https://gephi.org"
+            data-short="Analyse &amp; visualisation de réseaux de données"
+            data-long="Logiciel open-source de visualisation de graphes et réseaux de données. Utilisé en formation Bachelor pour cartographier des données relationnelles et identifier des patterns.">
+            <div class="tool-logo tool-logo-gephi" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="8" cy="16" r="4"/><circle cx="24" cy="8" r="3"/>
+                <circle cx="24" cy="24" r="3"/><circle cx="16" cy="16" r="2"/>
+                <line x1="12" y1="16" x2="14" y2="16"/>
+                <line x1="9.5" y1="13" x2="22" y2="10"/>
+                <line x1="9.5" y1="19" x2="22" y2="22"/>
+                <line x1="18" y1="15" x2="21.5" y2="9.5"/>
+                <line x1="18" y1="17" x2="21.5" y2="22.5"/>
+              </svg>
+            </div>
+            <div class="tool-text">
+              <span class="tool-name">Gephi</span>
+              <span class="tool-desc">Visualisation de réseaux de données</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-cat reveal">
+        <h3 class="tool-cat-title">Marketing &amp; Publicité</h3>
+        <div class="tool-list">
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/googleads"
+            data-name="Google Ads"
+            data-url="https://ads.google.com"
+            data-short="Campagnes Search, Display &amp; Shopping"
+            data-long="Création et optimisation de campagnes Search et Display. Paramétrage des enchères, ciblages géographiques et démographiques, suivi des conversions et analyse ROAS.">
+            <img src="https://cdn.simpleicons.org/googleads" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Google Ads</span>
+              <span class="tool-desc">Search, Display &amp; Shopping</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/meta"
+            data-name="Meta (Facebook &amp; Instagram)"
+            data-url="https://business.facebook.com"
+            data-short="Social Ads &amp; community management"
+            data-long="Gestion de campagnes publicitaires Facebook et Instagram. Création d'audiences personnalisées, A/B testing des visuels, analyse des métriques de performance et community management.">
+            <img src="https://cdn.simpleicons.org/meta" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Meta Ads</span>
+              <span class="tool-desc">Facebook &amp; Instagram Ads</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/hubspot"
+            data-name="HubSpot"
+            data-url="https://hubspot.com"
+            data-short="CRM &amp; marketing automation"
+            data-long="Utilisé chez Atelier CUB pour la gestion du pipeline commercial, le suivi des prospects, l'automatisation des relances email et le reporting des performances commerciales.">
+            <img src="https://cdn.simpleicons.org/hubspot" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">HubSpot</span>
+              <span class="tool-desc">CRM &amp; automation</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-cat reveal">
+        <h3 class="tool-cat-title">Production &amp; Bureautique</h3>
+        <div class="tool-list">
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/davinciresolve"
+            data-name="DaVinci Resolve"
+            data-url="https://www.blackmagicdesign.com/products/davinciresolve"
+            data-short="Montage vidéo &amp; post-production"
+            data-long="Montage et post-production vidéo pour les contenus d'Evasion Gym : réels Instagram, vidéos promotionnelles et présentations client. Correction colorimétrique et effets sonores.">
+            <img src="https://cdn.simpleicons.org/davinciresolve" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">DaVinci Resolve</span>
+              <span class="tool-desc">Montage vidéo &amp; post-prod</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+          <button class="tool-item"
+            data-logo="https://cdn.simpleicons.org/microsoft365"
+            data-name="Suite Microsoft"
+            data-url="https://www.microsoft.com/microsoft-365"
+            data-short="Word, Excel, PowerPoint, Teams"
+            data-long="Utilisation quotidienne et professionnelle : Word pour la rédaction de rapports, Excel pour l'analyse de données et tableaux de bord, PowerPoint pour les présentations clients, Teams pour la communication d'équipe.">
+            <img src="https://cdn.simpleicons.org/microsoft365" alt="" class="tool-logo" loading="lazy">
+            <div class="tool-text">
+              <span class="tool-name">Suite Microsoft</span>
+              <span class="tool-desc">Word, Excel, PowerPoint, Teams</span>
+            </div>
+            <span class="tool-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════
+       PASSION — À PROPOS
+  ═══════════════════════════════════ -->
+  <section id="apropos" class="section perso-section">
+    <div class="apropos-bg-orb" aria-hidden="true"></div>
+    <div class="apropos-sphere-deco" aria-hidden="true"></div>
+    <div class="s-head">
+      <span class="s-num">01</span>
+      <h2 class="s-title reveal">À Propos</h2>
+    </div>
+    <div class="apropos-wrap">
+      <div class="apropos-text reveal">
+        <p class="apropos-big">Jeune homme de <strong>22 ans</strong> basé à Bordeaux, passionné par la technologie, l'innovation et le digital depuis toujours.</p>
+        <p>J'explore quotidiennement des domaines variés : création de sites web, montage de PC fixe, compréhension du BIOS — tout cela avec un enthousiasme sincère et palpable.</p>
+        <p>Cette passion n'est pas une simple curiosité passive. Elle est le moteur de mon engagement quotidien et témoigne de ma détermination à aller au-delà de la simple théorie, en relevant des défis techniques concrets.</p>
+        <div class="apropos-details">
+          <span>Bordeaux, 33000</span>
+          <span>Véhiculé &mdash; Permis B</span>
+          <span>Anglais courant &amp; professionnel</span>
+          <span>Français natif</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════
+       PASSION — MES PASSIONS
+  ═══════════════════════════════════ -->
+  <section id="passions" class="section section-alt perso-section">
+    <div class="s-head">
+      <span class="s-num">02</span>
+      <h2 class="s-title reveal">Mes Passions</h2>
     </div>
 
-    <!-- PRO: skill tags -->
-    <div class="skills-wrap content-pro">
-      <div class="skill-cat reveal">
-        <h3 class="skill-cat-title">Data &amp; Analyse</h3>
-        <div class="skill-tags">
-          <span class="skill-tag">Google Analytics</span>
-          <span class="skill-tag">Analyse de données</span>
-          <span class="skill-tag">Stratégie data-driven</span>
-          <span class="skill-tag">Reporting</span>
-          <span class="skill-tag">Excel / Google Sheets</span>
-        </div>
-      </div>
-      <div class="skill-cat reveal">
-        <h3 class="skill-cat-title">Marketing Digital</h3>
-        <div class="skill-tags">
-          <span class="skill-tag">Meta Ads</span>
-          <span class="skill-tag">Gestion CMS</span>
-          <span class="skill-tag">SEO</span>
-          <span class="skill-tag">Email Marketing</span>
-          <span class="skill-tag">Community Management</span>
-          <span class="skill-tag">Digitalisation commerciale</span>
-        </div>
-      </div>
-      <div class="skill-cat reveal">
-        <h3 class="skill-cat-title">Outils &amp; Langues</h3>
-        <div class="skill-tags">
-          <span class="skill-tag">Figma</span>
-          <span class="skill-tag">CRM &amp; Relation client</span>
-          <span class="skill-tag">Vente multicanal</span>
-          <span class="skill-tag">Anglais courant &amp; professionnel</span>
-          <span class="skill-tag">Français natif</span>
-        </div>
-      </div>
-    </div>
+    <div class="passions-grid">
 
-    <!-- PERSO: passion cards -->
-    <div class="passions-wrap content-perso">
+      <!-- Guitare — avec GIF -->
       <div class="passion-card reveal">
-        <div class="passion-icon-wrap">
-          <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <circle cx="20" cy="20" r="16"/>
-            <path d="M20 4 C20 20 20 20 20 36"/>
-            <path d="M4 20 C20 20 20 20 36 20"/>
-            <path d="M7 7 C14 20 14 20 7 33"/>
-            <path d="M33 7 C26 20 26 20 33 33"/>
-          </svg>
+        <div class="passion-gif-wrap">
+          <!-- Upload guitar.gif à la racine du repo GitHub -->
+          <img src="guitar.gif" alt="Salif jouant de la guitare" class="passion-gif" loading="lazy">
         </div>
-        <h3 class="passion-name">Basket</h3>
-        <p class="passion-desc">Coach le samedi des U9 au Haillan pour les tournois</p>
-      </div>
-      <div class="passion-card reveal">
-        <div class="passion-icon-wrap">
-          <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <ellipse cx="20" cy="28" rx="8" ry="7"/>
-            <line x1="28" y1="25" x2="34" y2="10"/>
-            <line x1="12" y1="25" x2="6" y2="10"/>
-            <line x1="6" y1="10" x2="34" y2="10"/>
-            <line x1="18" y1="21" x2="22" y2="21"/>
+        <div class="passion-icon">
+          <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <ellipse cx="22" cy="31" rx="9" ry="8"/>
+            <line x1="31" y1="28" x2="38" y2="10"/>
+            <line x1="13" y1="28" x2="6" y2="10"/>
+            <line x1="6" y1="10" x2="38" y2="10"/>
+            <line x1="19" y1="23" x2="25" y2="23"/>
+            <line x1="22" y1="10" x2="22" y2="23"/>
           </svg>
         </div>
         <h3 class="passion-name">Guitare</h3>
-        <p class="passion-desc">Depuis l'âge de 10 ans, vecteur de créativité</p>
+        <p class="passion-text">Guitariste autodidacte depuis l'âge de 10 ans. La musique est pour moi un vecteur d'expression et de créativité que rien ne peut remplacer. Apprendre un instrument seul m'a forgé une discipline, une capacité d'apprentissage autonome et une persévérance que je retrouve dans tous mes projets.</p>
       </div>
+
+      <!-- Basket — avec GIF -->
       <div class="passion-card reveal">
-        <div class="passion-icon-wrap">
-          <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <rect x="4" y="14" width="32" height="18" rx="9"/>
-            <line x1="13" y1="20" x2="13" y2="26"/>
-            <line x1="10" y1="23" x2="16" y2="23"/>
-            <circle cx="27" cy="21" r="1.5" fill="currentColor"/>
-            <circle cx="31" cy="25" r="1.5" fill="currentColor"/>
-            <path d="M18 8 L22 8 L20 14 Z"/>
+        <div class="passion-gif-wrap">
+          <!-- Upload basket.gif à la racine du repo GitHub -->
+          <img src="basket.gif" alt="Séance de basket" class="passion-gif" loading="lazy">
+        </div>
+        <div class="passion-icon">
+          <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="22" cy="22" r="17"/>
+            <path d="M22 5 C22 22 22 22 22 39"/>
+            <path d="M5 22 C22 22 22 22 39 22"/>
+            <path d="M8.5 8.5 C16 22 16 22 8.5 35.5"/>
+            <path d="M35.5 8.5 C28 22 28 22 35.5 35.5"/>
+          </svg>
+        </div>
+        <h3 class="passion-name">Basket-ball</h3>
+        <p class="passion-text">Coach bénévole le samedi pour les U9 au Haillan lors des tournois. Une expérience qui m'a appris à transmettre, à gérer un groupe et à développer une vraie pédagogie. L'esprit d'équipe, la rigueur et la stratégie collective sont des valeurs que j'applique aussi dans mon travail.</p>
+      </div>
+
+      <!-- Gaming -->
+      <div class="passion-card reveal">
+        <div class="passion-icon">
+          <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <rect x="5" y="16" width="34" height="20" rx="10"/>
+            <line x1="14" y1="22" x2="14" y2="30"/>
+            <line x1="10" y1="26" x2="18" y2="26"/>
+            <circle cx="30" cy="23" r="2" fill="currentColor" stroke="none"/>
+            <circle cx="35" cy="28" r="2" fill="currentColor" stroke="none"/>
+            <path d="M20 10 L24 10 L22 16 Z" fill="currentColor" stroke="none"/>
           </svg>
         </div>
         <h3 class="passion-name">Gaming &amp; Tech</h3>
-        <p class="passion-desc">A monté son PC gaming de A à Z — étude &amp; plaisir</p>
+        <p class="passion-text">Gamer dans l'âme, j'ai monté mon PC gaming de A à Z — de la sélection des composants au câblage, en passant par la configuration du BIOS. Cette passion pour la technique m'a naturellement conduit à explorer la création de sites web, l'hébergement et les architectures informatiques. La tech n'est pas qu'un outil, c'est un terrain de jeu.</p>
       </div>
+
+      <!-- Lecture -->
       <div class="passion-card reveal">
-        <div class="passion-icon-wrap">
-          <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M8 8 L20 6 L32 8 L32 34 L20 32 L8 34 Z"/>
-            <line x1="20" y1="6" x2="20" y2="32"/>
-            <line x1="12" y1="14" x2="18" y2="14"/>
-            <line x1="12" y1="19" x2="18" y2="19"/>
-            <line x1="22" y1="14" x2="28" y2="14"/>
-            <line x1="22" y1="19" x2="28" y2="19"/>
+        <div class="passion-icon">
+          <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M9 9 L22 7 L35 9 L35 37 L22 35 L9 37 Z"/>
+            <line x1="22" y1="7" x2="22" y2="35"/>
+            <line x1="13" y1="16" x2="20" y2="16"/>
+            <line x1="13" y1="22" x2="20" y2="22"/>
+            <line x1="24" y1="16" x2="31" y2="16"/>
+            <line x1="24" y1="22" x2="31" y2="22"/>
           </svg>
         </div>
         <h3 class="passion-name">Lecture</h3>
-        <p class="passion-desc">Romans, débats, ouverture d'esprit</p>
+        <p class="passion-text">Lecteur assidu à mes heures perdues, aussi bien de romans que d'essais. J'apprécie particulièrement les débats d'idées et les échanges qui poussent à remettre en question ses certitudes. Cette ouverture d'esprit nourrit mon regard sur le monde du digital et m'aide à aborder chaque problématique avec recul et nuance.</p>
       </div>
-    </div>
-
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       PROJETS (03)
-  ══════════════════════════════════════════ -->
-  <section id="projets" class="section">
-    <div class="section-head">
-      <span class="section-num">03</span>
-      <h2 class="section-title reveal">Projets</h2>
-    </div>
-
-    <div class="projets-grid">
-
-      <article class="projet-card reveal">
-        <div class="projet-header">
-          <span class="projet-tag">Site vitrine</span>
-          <span class="projet-year">2022 — 2025</span>
-        </div>
-        <h3 class="projet-name">Evasion Gym</h3>
-        <p class="projet-desc">
-          Création et gestion du site vitrine pour la salle de fitness Evasion Gym à Eysines.
-          Stratégie digitale, animation des réseaux sociaux et suivi des performances.
-        </p>
-        <div class="projet-stack">
-          <span>CMS</span><span>Web Design</span><span>Marketing Digital</span>
-        </div>
-      </article>
-
-      <article class="projet-card projet-placeholder reveal">
-        <span class="placeholder-plus">+</span>
-        <p>Projets à venir</p>
-      </article>
 
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════
-       CONTACT (04)
-  ══════════════════════════════════════════ -->
-  <section id="contact" class="section section-alt">
-    <div class="section-head">
-      <span class="section-num">04</span>
-      <h2 class="section-title reveal">Contact</h2>
-    </div>
 
+  <!-- ═══════════════════════════════════
+       CONTACT (toujours visible)
+  ═══════════════════════════════════ -->
+  <section id="contact" class="section">
+    <div class="s-head">
+      <span class="s-num">03</span>
+      <h2 class="s-title reveal">Me Contacter</h2>
+    </div>
     <div class="contact-wrap">
-      <p class="contact-intro reveal">Un projet ? Une opportunité ? Parlons-en.</p>
-
-      <div class="contact-cards reveal">
-        <div class="contact-card">
-          <span class="cc-label">Email</span>
+      <p class="contact-lead reveal">Un projet ? Une opportunité ? Je suis disponible.</p>
+      <div class="contact-row reveal">
+        <div class="cc">
+          <span class="cc-lbl">Email</span>
           <a href="mailto:saliflacan00@gmail.com" class="cc-val">saliflacan00@gmail.com</a>
         </div>
-        <div class="contact-card">
-          <span class="cc-label">Téléphone</span>
+        <div class="cc">
+          <span class="cc-lbl">Téléphone</span>
           <a href="tel:+33788686421" class="cc-val">07 88 68 64 21</a>
           <a href="tel:+33640561337" class="cc-val">06 40 56 13 37</a>
         </div>
-        <div class="contact-card">
-          <span class="cc-label">Adresse</span>
+        <div class="cc">
+          <span class="cc-lbl">Localisation</span>
           <span class="cc-val">Bordeaux 33000</span>
-          <span class="cc-val cc-val--muted">Véhiculé — Permis B</span>
+          <span class="cc-val cc-small">Véhiculé &mdash; Permis B</span>
         </div>
       </div>
-
-      <form class="contact-form reveal" id="contact-form" novalidate>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="name">Nom</label>
-            <input type="text" id="name" name="name" placeholder="Votre nom" required autocomplete="name">
+      <form id="contact-form" class="contact-form reveal" novalidate>
+        <div class="f-row">
+          <div class="f-group">
+            <label for="f-name">Nom</label>
+            <input type="text" id="f-name" name="name" placeholder="Votre nom" required autocomplete="name">
           </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="votre@email.com" required autocomplete="email">
+          <div class="f-group">
+            <label for="f-email">Email</label>
+            <input type="email" id="f-email" name="email" placeholder="votre@email.com" required autocomplete="email">
           </div>
         </div>
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="4" placeholder="Votre projet ou besoin..." required></textarea>
+        <div class="f-group">
+          <label for="f-msg">Message</label>
+          <textarea id="f-msg" name="message" rows="4" placeholder="Votre projet ou votre besoin..." required></textarea>
         </div>
-        <button type="submit" class="btn-submit">
-          <span class="btn-text">Envoyer &rarr;</span>
-          <span class="btn-sent" aria-hidden="true">Envoyé !</span>
+        <button type="submit" class="btn-send">
+          <span class="bs-text">Envoyer &rarr;</span>
+          <span class="bs-ok" aria-hidden="true">Message envoyé !</span>
         </button>
       </form>
     </div>
   </section>
 
-  <!-- ─ FOOTER ──────────────────────────────── -->
   <footer class="footer">
-    <span>&copy; <span id="year"></span> Salif Lacan</span>
+    <span>&copy; <span id="yr"></span> Salif Lacan</span>
     <span>Marketing Digital &amp; Data &mdash; Bordeaux</span>
   </footer>
 
   <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
+  <script src="globe.js"></script>
 </body>
 </html>
