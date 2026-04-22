@@ -355,6 +355,7 @@
         m.scale.setScalar(1);
       });
       edgeMats.forEach(function (e) {
+        e.mat.color.set(C_MAIN);
         e.mat.opacity = e.isMain ? 0.32 : 0.20;
       });
       globe.children.forEach(function (c) {
@@ -363,31 +364,42 @@
     }
 
     function highlightNode(id) {
-      var connected = new Set();
-      EDGES.forEach(function (pair) {
-        if (pair[0] === id) connected.add(pair[1]);
-        if (pair[1] === id) connected.add(pair[0]);
-      });
-      NODES.forEach(function (nd) {
-        var m = meshes[nd.id]; if (!m) return;
-        if (nd.id === id) {
+      var nd  = NODES[id];
+      /* Nœuds qui restent visibles (le nœud + ses connexions directes) */
+      var vis = new Set([id]);
+      if (nd.type === 'main') {
+        /* Nœud principal : montrer uniquement ses sous-nœuds directs */
+        NODES.forEach(function (n) {
+          if (n.type === 'sub' && n.mainIdx === nd.mainIdx) vis.add(n.id);
+        });
+      } else {
+        /* Sous-nœud : montrer uniquement son parent */
+        vis.add(mainIds[nd.mainIdx]);
+      }
+
+      NODES.forEach(function (n) {
+        var m = meshes[n.id]; if (!m) return;
+        if (n.id === id) {
           m.material.color.set(C_MAIN);
           m.material.opacity = 1;
           m.scale.setScalar(1.85);
-        } else if (connected.has(nd.id)) {
-          m.material.opacity = 0.88;
-          m.scale.setScalar(1.08);
+        } else if (vis.has(n.id)) {
+          m.material.color.set(n.type === 'main' ? C_MAIN : 0xffffff);
+          m.material.opacity = 0.85;
+          m.scale.setScalar(1);
         } else {
-          m.material.opacity = 0.10;
+          m.material.opacity = 0.08;
+          m.scale.setScalar(1);
         }
       });
       edgeMats.forEach(function (e) {
-        e.mat.opacity = (e.a === id || e.b === id) ? 0.90 : 0.04;
+        var lit = (e.a === id || e.b === id) && vis.has(e.a) && vis.has(e.b);
+        e.mat.color.set(lit ? 0xF59E0B : C_MAIN);
+        e.mat.opacity = lit ? 0.90 : 0.03;
       });
       globe.children.forEach(function (c) {
-        if (c.userData.isGlow) {
-          c.material.opacity = c.userData.nodeId === id ? 0.48 : 0.04;
-        }
+        if (c.userData.isGlow)
+          c.material.opacity = c.userData.nodeId === id ? 0.48 : 0.03;
       });
     }
 
