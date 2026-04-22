@@ -92,7 +92,6 @@ function initAll() {
   initAproposOrb();
   initScrollCircle();
   initModeToggle();
-  initToolModal();
   initToolPanel();
   initContactForm();
   initDownloadCV();
@@ -1028,9 +1027,11 @@ function initToolPanel() {
   const fallback       = document.getElementById('tool-iframe-fallback');
   const fallbackOpen   = document.getElementById('fallback-open');
   const fallbackName   = document.getElementById('fallback-name');
+  const fallbackShort  = document.getElementById('fallback-short');
+  const fallbackLong   = document.getElementById('fallback-long');
   if (!panel) return;
 
-  /* Marquer les skill-tags qui ont une entrée dans la DB */
+  /* Marquer les skill-tags (#outils) qui ont une entrée dans la DB */
   document.querySelectorAll('#outils .skill-tag').forEach(tag => {
     const label = tag.textContent.trim();
     if (toolsDatabase[label]) {
@@ -1040,7 +1041,7 @@ function initToolPanel() {
     }
   });
 
-  /* Invite cliquable au-dessus de la grille (ajoutée une seule fois) */
+  /* Invite au-dessus de la grille #outils (une seule fois) */
   const skillsGrid = document.querySelector('#outils .skills-grid');
   if (skillsGrid && !skillsGrid.parentNode.querySelector('.skills-invite')) {
     const invite = document.createElement('p');
@@ -1051,31 +1052,33 @@ function initToolPanel() {
 
   let fallbackTimer = null;
 
-  function openPanel(toolName) {
-    const data = toolsDatabase[toolName];
-    if (!data) return;
-
+  /*
+   * openPanel({ name, url, cat, short, long })
+   * Utilisé par skill-tags (#outils) ET tool-items (#logiciels)
+   */
+  function openPanel({ name, url, cat, short = '', long = '' }) {
     /* Reset */
     clearTimeout(fallbackTimer);
     iframeOverlay.classList.remove('is-activated');
     fallback.classList.remove('is-visible');
     iframe.src = '';
 
-    /* Remplir */
-    nameEl.textContent       = toolName;
-    catEl.textContent        = data.cat;
-    fallbackName.textContent = toolName;
-    fallbackOpen.href        = data.url;
-    urlDisplay.textContent   = data.url
-      .replace(/^https?:\/\//, '').split('/')[0];
+    /* Remplir le panneau */
+    nameEl.textContent        = name;
+    catEl.textContent         = cat;
+    fallbackName.textContent  = name;
+    fallbackOpen.href         = url;
+    fallbackShort.textContent = short;
+    fallbackLong.textContent  = long;
+    urlDisplay.textContent    = url.replace(/^https?:\/\//, '').split('/')[0];
 
     /* Charger l'iframe */
-    iframe.src = data.url;
+    iframe.src = url;
 
-    /* Fallback si l'iframe ne se charge pas en 6 s */
+    /* Fallback si l'iframe ne se charge pas en 5 s */
     fallbackTimer = setTimeout(() => {
       fallback.classList.add('is-visible');
-    }, 6000);
+    }, 5000);
 
     iframe.onload = () => {
       clearTimeout(fallbackTimer);
@@ -1116,14 +1119,29 @@ function initToolPanel() {
     iframe.focus();
   });
 
-  /* Skill tags */
+  /* Skill tags (#outils) */
   document.querySelectorAll('.skill-tag[data-tool]').forEach(tag => {
-    tag.addEventListener('click', () => openPanel(tag.getAttribute('data-tool')));
+    const open = () => {
+      const name = tag.getAttribute('data-tool');
+      const d    = toolsDatabase[name];
+      if (d) openPanel({ name, url: d.url, cat: d.cat });
+    };
+    tag.addEventListener('click', open);
     tag.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        openPanel(tag.getAttribute('data-tool'));
-      }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+
+  /* Tool items (#logiciels) — remplace l'ancien modal texte */
+  document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openPanel({
+        name:  btn.dataset.name  || '',
+        url:   btn.dataset.url   || '#',
+        cat:   btn.closest('.tool-cat')?.querySelector('.tool-cat-title')?.textContent || 'Outil',
+        short: btn.dataset.short || '',
+        long:  btn.dataset.long  || '',
+      });
     });
   });
 
