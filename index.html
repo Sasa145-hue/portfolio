@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salif Lacan — Marketing Digital & Data</title>
+  <meta name="description" content="Consultant Marketing Digital & Data — GA4, SEO, Growth, Analytics. Paris.">
+  <meta name="theme-color" content="#080808">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       LOADER
+  ══════════════════════════════════════ -->
+  <div id="loader" role="status" aria-label="Chargement">
+    <div class="loader-inner">
+      <div class="loader-name">SALIF LACAN</div>
+      <div class="loader-bar-wrap">
+        <div class="loader-bar" id="loader-bar"></div>
+      </div>
+      <div class="loader-percent" id="loader-percent">0%</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════ -->
+  <nav id="nav" role="navigation" aria-label="Navigation principale">
+    <a href="#home" class="nav-logo" aria-label="Accueil — Salif Lacan">SALIF LACAN</a>
+
+    <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span>
+      <span></span>
+    </button>
+
+    <ul class="nav-links" role="list">
+      <li><a href="#experiences">Expériences</a></li>
+      <li><a href="#competences">Compétences</a></li>
+      <li><a href="#metrics">Impact</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- MENU MOBILE -->
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <nav aria-label="Menu mobile">
+      <ul role="list">
+        <li><a href="#experiences" class="mobile-link">Expériences</a></li>
+        <li><a href="#competences" class="mobile-link">Compétences</a></li>
+        <li><a href="#metrics" class="mobile-link">Impact</a></li>
+        <li><a href="#contact" class="mobile-link">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       HERO
+  ══════════════════════════════════════ -->
+  <section id="home" class="hero" aria-label="Introduction">
+    <div class="hero-content">
+
+      <div class="hero-tags" aria-hidden="true">
+        <span class="tag active">DATA ANALYST</span>
+        <span class="tag">MARKETING DIGITAL</span>
+        <span class="tag">GROWTH HACKER</span>
+        <span class="tag">SEO EXPERT</span>
+        <span class="tag">CRM MANAGER</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line" data-delay="200">SALIF</span>
+        <span class="line" data-delay="320">LACAN</span>
+      </h1>
+
+      <p class="hero-subtitle reveal" data-delay="500">
+        Consultant Marketing Digital &amp; Data &mdash; Paris
+      </p>
+
+      <div class="hero-links reveal" data-delay="650">
+        <!-- ⚠️ Remplacer par votre vrai email -->
+        <a href="mailto:contact@saliflacan.fr" class="btn-outline" aria-label="Envoyer un email">
+          contact@saliflacan.fr
+        </a>
+        <!-- ⚠️ Remplacer par votre URL LinkedIn -->
+        <a href="https://linkedin.com/in/saliflacan" target="_blank" rel="noopener noreferrer" class="btn-outline" aria-label="Profil LinkedIn (nouvel onglet)">
+          LinkedIn &rarr;
+        </a>
+      </div>
+    </div>
+
+    <div class="scroll-indicator" aria-hidden="true">
+      <span>scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       EXPÉRIENCES
+  ══════════════════════════════════════ -->
+  <section id="experiences" class="section" aria-labelledby="exp-title">
+    <div class="section-header">
+      <span class="section-num" aria-hidden="true">01</span>
+      <h2 class="section-title reveal" id="exp-title">Expériences</h2>
+    </div>
+
+    <div class="exp-grid">
+
+      <!-- ⚠️ Expérience 1 — À personnaliser avec vos vraies données Figma -->
+      <article class="exp-card reveal">
+        <div class="exp-meta">
+          <time class="exp-date" datetime="2023">2023 &mdash; Présent</time>
+          <span class="exp-type">CDI</span>
+        </div>
+        <h3 class="exp-role">Consultant Marketing Digital &amp; Data</h3>
+        <p class="exp-company">Agence Digitale — Paris</p>
+        <ul class="exp-missions">
+          <li>Pilotage des campagnes SEA (Google Ads, Meta Ads) avec optimisation du ROAS</li>
+          <li>Création de tableaux de bord Looker Studio pour le suivi des KPIs clients</li>
+          <li>Analyse des données GA4, recommandations CRO et A/B testing</li>
+          <li>Accompagnement de 8+ clients sur leur stratégie data-driven</li>
+        </ul>
+      </article>
+
+      <!-- ⚠️ Expérience 2 — À personnaliser -->
+      <article class="exp-card reveal">
+        <div class="exp-meta">
+          <time class="exp-date" datetime="2022">2022 &mdash; 2023</time>
+          <span class="exp-type">CDI</span>
+        </div>
+        <h3 class="exp-role">Traffic Manager</h3>
+        <p class="exp-company">E-Commerce Brand — Paris</p>
+        <ul class="exp-missions">
+          <li>Gestion des budgets publicitaires Google &amp; Meta (+250k€/an)</li>
+          <li>Optimisation des tunnels de conversion et tests A/B</li>
+          <li>Reporting hebdomadaire et analyse des KPIs (CAC, ROAS, LTV)</li>
+          <li>Paramétrage Google Tag Manager et suivi des événements</li>
+        </ul>
+      </article>
+
+      <!-- ⚠️ Expérience 3 — À personnaliser -->
+      <article class="exp-card reveal">
+        <div class="exp-meta">
+          <time class="exp-date" datetime="2021">2021 &mdash; 2022</time>
+          <span class="exp-type">Alternance</span>
+        </div>
+        <h3 class="exp-role">Chargé de Marketing Digital</h3>
+        <p class="exp-company">StartupTech — Lyon</p>
+        <ul class="exp-missions">
+          <li>Stratégie SEO on-page et off-page avec audit technique Semrush</li>
+          <li>Animation des réseaux sociaux et community management</li>
+          <li>Mise en place des flows d'automation email HubSpot</li>
+          <li>Analyse de performance via Google Analytics &amp; Search Console</li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       COMPÉTENCES
+  ══════════════════════════════════════ -->
+  <section id="competences" class="section section-alt" aria-labelledby="skills-title">
+    <div class="section-header">
+      <span class="section-num" aria-hidden="true">02</span>
+      <h2 class="section-title reveal" id="skills-title">Compétences</h2>
+    </div>
+
+    <div class="skills-grid">
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Data &amp; Analytics</h3>
+        <div class="skill-tags" role="list">
+          <span class="skill-tag" role="listitem">Google Analytics 4</span>
+          <span class="skill-tag" role="listitem">Looker Studio</span>
+          <span class="skill-tag" role="listitem">BigQuery</span>
+          <span class="skill-tag" role="listitem">SQL</span>
+          <span class="skill-tag" role="listitem">Python</span>
+          <span class="skill-tag" role="listitem">Google Tag Manager</span>
+          <span class="skill-tag" role="listitem">Google Search Console</span>
+          <span class="skill-tag" role="listitem">Excel / Sheets</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Marketing Digital</h3>
+        <div class="skill-tags" role="list">
+          <span class="skill-tag" role="listitem">SEO</span>
+          <span class="skill-tag" role="listitem">Google Ads</span>
+          <span class="skill-tag" role="listitem">Meta Ads</span>
+          <span class="skill-tag" role="listitem">LinkedIn Ads</span>
+          <span class="skill-tag" role="listitem">TikTok Ads</span>
+          <span class="skill-tag" role="listitem">Email Marketing</span>
+          <span class="skill-tag" role="listitem">CRO</span>
+          <span class="skill-tag" role="listitem">Growth Hacking</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Outils &amp; Plateformes</h3>
+        <div class="skill-tags" role="list">
+          <span class="skill-tag" role="listitem">HubSpot</span>
+          <span class="skill-tag" role="listitem">Salesforce</span>
+          <span class="skill-tag" role="listitem">Semrush</span>
+          <span class="skill-tag" role="listitem">Ahrefs</span>
+          <span class="skill-tag" role="listitem">Hotjar</span>
+          <span class="skill-tag" role="listitem">Klaviyo</span>
+          <span class="skill-tag" role="listitem">Notion</span>
+          <span class="skill-tag" role="listitem">Figma</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       CHIFFRES CLÉS — IMPACT
+  ══════════════════════════════════════ -->
+  <section id="metrics" class="section" aria-labelledby="metrics-title">
+    <div class="section-header">
+      <span class="section-num" aria-hidden="true">03</span>
+      <h2 class="section-title reveal" id="metrics-title">Impact</h2>
+    </div>
+
+    <div class="metrics-grid">
+
+      <!-- ⚠️ Remplacer data-target par vos vrais chiffres -->
+      <div class="metric-item reveal">
+        <div class="metric-value">
+          <span class="metric-num" data-target="42">0</span><span class="metric-suffix">%</span>
+        </div>
+        <p class="metric-label">Augmentation du taux de conversion moyen</p>
+      </div>
+
+      <div class="metric-item reveal">
+        <div class="metric-value">
+          <span class="metric-num" data-target="8">0</span><span class="metric-suffix">×</span>
+        </div>
+        <p class="metric-label">ROAS moyen sur campagnes gérées</p>
+      </div>
+
+      <div class="metric-item reveal">
+        <div class="metric-value">
+          <span class="metric-num" data-target="250">0</span><span class="metric-suffix">k€</span>
+        </div>
+        <p class="metric-label">Budget publicitaire géré annuellement</p>
+      </div>
+
+      <div class="metric-item reveal">
+        <div class="metric-value">
+          <span class="metric-num" data-target="3">0</span><span class="metric-suffix">+</span>
+        </div>
+        <p class="metric-label">Années d'expérience data-driven</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       CONTACT
+  ══════════════════════════════════════ -->
+  <section id="contact" class="section section-alt" aria-labelledby="contact-title">
+    <div class="section-header">
+      <span class="section-num" aria-hidden="true">04</span>
+      <h2 class="section-title reveal" id="contact-title">Contact</h2>
+    </div>
+
+    <div class="contact-wrap">
+      <p class="contact-intro reveal">Un projet&nbsp;? Une mission&nbsp;? Discutons-en.</p>
+
+      <form class="contact-form reveal" id="contact-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nom</label>
+            <input type="text" id="name" name="name" placeholder="Votre nom" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="votre@email.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Décrivez votre projet ou besoin..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">
+          <span class="btn-text">Envoyer le message &rarr;</span>
+          <span class="btn-sent" aria-hidden="true">Message envoyé ✓</span>
+        </button>
+      </form>
+
+      <div class="social-links reveal" role="list">
+        <!-- ⚠️ Remplacer par vos vraies URLs -->
+        <a href="https://linkedin.com/in/saliflacan" target="_blank" rel="noopener noreferrer" class="social-link" role="listitem" aria-label="LinkedIn (nouvel onglet)">LinkedIn</a>
+        <a href="mailto:contact@saliflacan.fr" class="social-link" role="listitem" aria-label="Envoyer un email">Email</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer class="footer" role="contentinfo">
+    <span>&copy; <span id="year"></span> Salif Lacan</span>
+    <span>Marketing Digital &amp; Data</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
