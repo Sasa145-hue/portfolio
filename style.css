@@ -849,6 +849,58 @@ textarea { resize: vertical; min-height: 130px; }
 
 
 /* ══════════════════════════════════════════════════════════════
+   OUTILS MAÎTRISÉS — skills grid
+══════════════════════════════════════════════════════════════ */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.6rem;
+  margin-top: 2.4rem;
+}
+
+.skill-category {
+  background: var(--bg-card);
+  border: 1px solid var(--border-acc);
+  border-radius: 12px;
+  padding: 1.4rem 1.25rem 1.25rem;
+  transition: background .65s ease, border-color .65s ease;
+}
+
+.skill-cat-title {
+  font-family: var(--font-t);
+  font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  transition: color .65s ease;
+}
+
+.skill-tags {
+  display: flex; flex-wrap: wrap; gap: .45rem;
+}
+
+.skill-tag {
+  display: inline-block;
+  font-size: .72rem; font-weight: 500; letter-spacing: .05em;
+  padding: .28rem .72rem;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  color: var(--text-dim);
+  transition: border-color .2s, color .2s, background .2s;
+  cursor: default;
+}
+.skill-tag:hover {
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+  background: rgba(139, 92, 246, 0.10);
+}
+body.mode-perso .skill-tag:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
    GLOBE 3D
 ══════════════════════════════════════════════════════════════ */
 .globe-section {
