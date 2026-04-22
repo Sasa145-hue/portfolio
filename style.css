@@ -859,7 +859,7 @@ textarea { resize: vertical; min-height: 130px; }
   background: transparent;
 }
 
-#globe-canvas {
+.globe-canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
@@ -963,6 +963,82 @@ textarea { resize: vertical; min-height: 130px; }
 @media (prefers-reduced-motion: reduce) {
   .globe-invite { animation: none; opacity: .55; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBE — MODALE SOUS-NŒUDS
+══════════════════════════════════════════════════════════════ */
+.gmodal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.62);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 900;
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s ease;
+}
+.gmodal-overlay.is-open {
+  opacity: 1; pointer-events: auto;
+}
+
+.gmodal-card {
+  position: relative;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-acc);
+  border-radius: 16px;
+  padding: 2.2rem 2rem 1.8rem;
+  width: min(400px, 90vw);
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  transition: background .65s ease, border-color .65s ease;
+}
+
+.gmodal-close {
+  position: absolute; top: .9rem; right: 1rem;
+  background: transparent; border: none;
+  color: var(--text-faint); font-size: 1.5rem; line-height: 1;
+  padding: .15rem .4rem; cursor: pointer;
+  transition: color .2s;
+}
+.gmodal-close:hover { color: var(--text); }
+
+.gmodal-title {
+  font-family: var(--font-t);
+  font-size: 1.45rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: .75rem;
+  transition: color .65s ease;
+}
+
+.gmodal-desc {
+  font-size: .84rem; line-height: 1.6;
+  color: var(--text-dim); margin-bottom: 1.25rem;
+  transition: color .65s ease;
+}
+
+.gmodal-bar-track {
+  height: 6px; background: var(--border);
+  border-radius: 99px; overflow: hidden;
+  margin-bottom: .55rem;
+  transition: background .65s ease;
+}
+.gmodal-bar-fill {
+  height: 100%; width: 0%; border-radius: 99px;
+}
+
+.gmodal-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+}
+
+.gmodal-level {
+  font-family: var(--font-b); font-size: .78rem; font-weight: 700;
+  letter-spacing: .12em; color: var(--text);
+  transition: color .65s ease;
+}
+
+.gmodal-link {
+  font-size: .78rem; font-weight: 600; letter-spacing: .04em;
+  text-decoration: none; border-bottom: 1px solid currentColor;
+  transition: opacity .2s;
+}
+.gmodal-link:hover { opacity: .72; }
 
 
 /* ══════════════════════════════════════════════════════════════
