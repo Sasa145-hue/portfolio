@@ -1037,27 +1037,6 @@ textarea { resize: vertical; min-height: 130px; }
   transition: color .65s ease;
 }
 
-.gmodal-bar-track {
-  height: 6px; background: var(--border);
-  border-radius: 99px; overflow: hidden;
-  margin-bottom: .55rem;
-  transition: background .65s ease;
-}
-.gmodal-bar-fill {
-  height: 100%; width: 0%; border-radius: 99px;
-}
-
-.gmodal-meta {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 1rem;
-}
-
-.gmodal-level {
-  font-family: var(--font-b); font-size: .78rem; font-weight: 700;
-  letter-spacing: .12em; color: var(--text);
-  transition: color .65s ease;
-}
-
 .gmodal-link {
   font-size: .78rem; font-weight: 600; letter-spacing: .04em;
   text-decoration: none; border-bottom: 1px solid currentColor;

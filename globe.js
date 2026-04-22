@@ -123,11 +123,7 @@
         '<button class="gmodal-close" aria-label="Fermer">×</button>' +
         '<h4 class="gmodal-title"></h4>' +
         '<p class="gmodal-desc"></p>' +
-        '<div class="gmodal-bar-track"><div class="gmodal-bar-fill"></div></div>' +
-        '<div class="gmodal-meta">' +
-          '<span class="gmodal-level"></span>' +
-          '<a class="gmodal-link" target="_blank" rel="noopener">En savoir plus →</a>' +
-        '</div>' +
+        '<a class="gmodal-link" target="_blank" rel="noopener">En savoir plus →</a>' +
       '</div>';
     document.body.appendChild(el);
     el.querySelector('.gmodal-close').addEventListener('click', function () {
@@ -142,14 +138,9 @@
 
   function openSubModal(sub, accentHex) {
     var ov   = getModal();
-    var fill = ov.querySelector('.gmodal-bar-fill');
     var link = ov.querySelector('.gmodal-link');
     ov.querySelector('.gmodal-title').textContent = sub.name;
     ov.querySelector('.gmodal-desc').textContent  = sub.desc;
-    ov.querySelector('.gmodal-level').textContent = sub.level + ' %';
-    fill.style.transition = 'none';
-    fill.style.width      = '0%';
-    fill.style.background = accentHex;
     if (sub.url && sub.url !== '#') {
       link.href = sub.url;
       link.style.cssText = 'display:inline;color:' + accentHex;
@@ -157,12 +148,6 @@
       link.style.display = 'none';
     }
     ov.classList.add('is-open');
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        fill.style.transition = 'width .65s cubic-bezier(.16,1,.3,1)';
-        fill.style.width = sub.level + '%';
-      });
-    });
   }
 
   /* ═══════════════════════════════════════════════════════════
