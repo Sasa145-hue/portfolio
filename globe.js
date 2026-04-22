@@ -391,6 +391,64 @@
       });
     }
 
+    /* ── Zoom — focus exclusif ── */
+    function applyZoomHL(mainId) {
+      var mainNd = NODES[mainId];
+      NODES.forEach(function (nd) {
+        var m = meshes[nd.id]; if (!m) return;
+        if (nd.id === mainId) {
+          m.material.color.set(C_MAIN);
+          m.material.opacity = 1;
+          m.scale.setScalar(2.5);
+        } else if (nd.type === 'sub' && nd.mainIdx === mainNd.mainIdx) {
+          m.material.color.set(0xffffff);
+          m.material.opacity = 0.90;
+          m.scale.setScalar(1);
+        } else {
+          m.material.opacity = 0;
+          m.scale.setScalar(1);
+        }
+      });
+      edgeMats.forEach(function (e) {
+        var isDirect =
+          (e.a === mainId && NODES[e.b].type === 'sub' && NODES[e.b].mainIdx === mainNd.mainIdx) ||
+          (e.b === mainId && NODES[e.a].type === 'sub' && NODES[e.a].mainIdx === mainNd.mainIdx);
+        e.mat.color.set(isDirect ? 0xF59E0B : C_MAIN);
+        e.mat.opacity = isDirect ? 1.0 : 0;
+      });
+      globe.children.forEach(function (c) {
+        if (c.userData.isGlow)
+          c.material.opacity = c.userData.nodeId === mainId ? 0.50 : 0;
+      });
+    }
+
+    function zoomToNode(nd) {
+      var worldPos = new THREE.Vector3();
+      meshes[nd.id].getWorldPosition(worldPos);
+      camTarget.copy(worldPos.clone().normalize().multiplyScalar(4.0));
+      zoomedMainId = nd.id;
+      zoomMeshes = NODES
+        .filter(function (n) { return n.id === nd.id || (n.type === 'sub' && n.mainIdx === nd.mainIdx); })
+        .map(function (n) { return meshes[n.id]; })
+        .filter(Boolean);
+      applyZoomHL(nd.id);
+      tgX = 0; tgY = 0;
+      autoRot = !reduced;
+      backBtn.style.display = '';
+      fadeInvite();
+    }
+
+    function resetZoom() {
+      camTarget.set(0, 0, BASE_Z);
+      zoomedMainId = -1;
+      zoomMeshes   = [];
+      backBtn.style.display = 'none';
+      resetHL();
+      autoRot = !reduced;
+    }
+
+    backBtn.addEventListener('click', resetZoom);
+
     /* ── Interaction ── */
     var mouse = new THREE.Vector2(-9, -9);
     var ray   = new THREE.Raycaster();
@@ -404,33 +462,59 @@
     var tX = 0, tY = 0, tgX = 0, tgY = 0;
     var lastCX = 0, lastCY = 0;
 
+    /* ── Zoom état ── */
+    var BASE_Z       = 5.5;
+    var camTarget    = new THREE.Vector3(0, 0, BASE_Z);
+    var zoomedMainId = -1;
+    var zoomMeshes   = [];
+
+    /* Bouton ← Retour */
+    var backBtn = document.createElement('button');
+    backBtn.className = 'globe-back-btn';
+    backBtn.textContent = '← Retour';
+    backBtn.style.display = 'none';
+    container.appendChild(backBtn);
+
     canvas.addEventListener('mousemove', function (e) {
       lastCX = e.clientX;
       lastCY = e.clientY;
       var r = canvas.getBoundingClientRect();
       mouse.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
       mouse.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
-      var cx = r.left + r.width  / 2;
-      var cy = r.top  + r.height / 2;
-      tgY = ((e.clientX - cx) / (r.width  / 2)) * 0.18;
-      tgX = ((e.clientY - cy) / (r.height / 2)) * 0.10;
+      /* Tilt uniquement hors zoom */
+      if (zoomedMainId < 0) {
+        var cx = r.left + r.width  / 2;
+        var cy = r.top  + r.height / 2;
+        tgY = ((e.clientX - cx) / (r.width  / 2)) * 0.18;
+        tgX = ((e.clientY - cy) / (r.height / 2)) * 0.10;
+      }
     }, { passive: true });
 
     canvas.addEventListener('mouseleave', function () {
       mouse.set(-9, -9);
       hideTip();
-      if (hovId >= 0) { resetHL(); hovId = -1; }
-      tgX = 0; tgY = 0;
-      autoRot = !reduced;
+      if (hovId >= 0) {
+        hovId = -1;
+        if (zoomedMainId >= 0) applyZoomHL(zoomedMainId);
+        else { resetHL(); autoRot = !reduced; }
+      }
+      if (zoomedMainId < 0) { tgX = 0; tgY = 0; autoRot = !reduced; }
       canvas.style.cursor = '';
     }, { passive: true });
 
     canvas.addEventListener('click', function () {
-      if (hovId < 0) return;
       fadeInvite();
-      var nd = NODES[hovId];
-      if (nd.type === 'main') openPanel(nd);
-      else                    openSubModal(nd.subData, C_HEX);
+      if (hovId >= 0) {
+        var nd = NODES[hovId];
+        if (nd.type === 'main') {
+          if (zoomedMainId === nd.id) resetZoom();
+          else zoomToNode(nd);
+        } else {
+          openSubModal(nd.subData, C_HEX);
+        }
+      } else if (zoomedMainId >= 0) {
+        resetZoom();
+      }
     });
 
     /* Drag tactile pour faire pivoter */
@@ -451,37 +535,40 @@
     /* ── Boucle de rendu ── */
     function tick() {
       requestAnimationFrame(tick);
-      /* Sauter les frames quand la section est cachée */
       if (container.clientWidth === 0) return;
 
       if (!reduced) {
-        if (autoRot) rotY += 0.00068;
+        if (autoRot) rotY += (zoomedMainId >= 0 ? 0.00034 : 0.00068);
         tX += (tgX - tX) * 0.05;
         tY += (tgY - tY) * 0.05;
         globe.rotation.y = rotY;
         globe.rotation.x = tX;
       }
 
+      /* Zoom caméra (lerp vers la cible) */
+      camera.position.lerp(camTarget, 0.055);
+      camera.lookAt(0, 0, 0);
+
+      var castMeshes = (zoomedMainId >= 0) ? zoomMeshes : interMeshes;
       ray.setFromCamera(mouse, camera);
-      var hits = ray.intersectObjects(interMeshes, false);
+      var hits = ray.intersectObjects(castMeshes, false);
 
       if (hits.length) {
         var id = hits[0].object.userData.nodeId;
         if (id !== hovId) {
-          resetHL();
+          if (zoomedMainId < 0) { resetHL(); autoRot = false; }
           highlightNode(id);
           hovId = id;
-          autoRot = false;
         }
         canvas.style.cursor = 'pointer';
         showTip(NODES[id].label, lastCX, lastCY);
       } else {
         if (hovId >= 0) {
-          resetHL();
           hovId = -1;
-          autoRot = !reduced;
           hideTip();
           canvas.style.cursor = '';
+          if (zoomedMainId >= 0) applyZoomHL(zoomedMainId);
+          else { resetHL(); autoRot = !reduced; }
         }
       }
 

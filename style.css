@@ -964,6 +964,31 @@ textarea { resize: vertical; min-height: 130px; }
   .globe-invite { animation: none; opacity: .55; }
 }
 
+.globe-back-btn {
+  position: absolute;
+  top: 1.1rem; left: 1.1rem;
+  z-index: 20;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-acc);
+  color: var(--text);
+  font-family: var(--font-b); font-size: .68rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: .4rem .95rem;
+  border-radius: 8px;
+  transition: background .2s, color .2s, border-color .2s, opacity .3s;
+  opacity: 0;
+  animation: backBtnIn .3s var(--ease) forwards;
+}
+.globe-back-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+@keyframes backBtnIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 /* ══════════════════════════════════════════════════════════════
    GLOBE — MODALE SOUS-NŒUDS
 ══════════════════════════════════════════════════════════════ */
