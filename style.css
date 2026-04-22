@@ -1196,6 +1196,8 @@ body.mode-perso .skill-tag:hover {
 .section-alt.diag-visible {
   clip-path: polygon(-5% 0, 100% 0, 105% 100%, 0 100%);
 }
+/* Outils section: always visible, no clip-path animation */
+#outils { clip-path: none !important; }
 
 
 /* ══════════════════════════════════════════════════════════════
