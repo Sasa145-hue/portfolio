@@ -892,58 +892,6 @@ textarea { resize: vertical; min-height: 130px; }
 
 
 /* ══════════════════════════════════════════════════════════════
-   OUTILS MAÎTRISÉS — skills grid
-══════════════════════════════════════════════════════════════ */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.6rem;
-  margin-top: 2.4rem;
-}
-
-.skill-category {
-  background: var(--bg-card);
-  border: 1px solid var(--border-acc);
-  border-radius: 12px;
-  padding: 1.4rem 1.25rem 1.25rem;
-  transition: background .65s ease, border-color .65s ease;
-}
-
-.skill-cat-title {
-  font-family: var(--font-t);
-  font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  transition: color .65s ease;
-}
-
-.skill-tags {
-  display: flex; flex-wrap: wrap; gap: .45rem;
-}
-
-.skill-tag {
-  display: inline-block;
-  font-size: .72rem; font-weight: 500; letter-spacing: .05em;
-  padding: .28rem .72rem;
-  border: 1px solid var(--border);
-  border-radius: 99px;
-  color: var(--text-dim);
-  transition: border-color .2s, color .2s, background .2s;
-  cursor: default;
-}
-.skill-tag:hover {
-  border-color: #8B5CF6;
-  color: #8B5CF6;
-  background: rgba(139, 92, 246, 0.10);
-}
-body.mode-perso .skill-tag:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-soft);
-}
-
-
-/* ══════════════════════════════════════════════════════════════
    GLOBE 3D
 ══════════════════════════════════════════════════════════════ */
 .globe-section {
@@ -1564,30 +1512,6 @@ body.mode-perso .modal-logo-big {
   transition: background 0.25s, transform 0.2s;
 }
 .fallback-open:hover { background: #D97706; transform: translateY(-2px); }
-
-/* ── Skill tags cliquables ── */
-.skill-tag[data-tool] { cursor: pointer; }
-.skill-tag[data-tool]::after {
-  content: ' ↗';
-  font-size: 0.6rem; opacity: 0.4;
-  transition: opacity 0.2s;
-}
-.skill-tag[data-tool]:hover {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: #F59E0B;
-  color: #F59E0B;
-}
-.skill-tag[data-tool]:hover::after { opacity: 1; }
-
-/* ── Invite ── */
-.skills-invite {
-  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(139, 92, 246, 0.6); margin-bottom: 2rem;
-  display: flex; align-items: center; gap: 0.5rem;
-}
-.skills-invite::before {
-  content: ''; width: 20px; height: 1px; background: #8B5CF6; opacity: 0.4;
-}
 
 /* ── Mobile ── */
 @media (max-width: 768px) {

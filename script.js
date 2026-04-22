@@ -144,7 +144,7 @@ function initCursor() {
   });
 
   /* Scale sur éléments interactifs */
-  document.querySelectorAll('a, button, .tool-item, .skill-tag, .tl').forEach(el => {
+  document.querySelectorAll('a, button, .tool-item, .tl').forEach(el => {
     el.addEventListener('mouseenter', () => {
       gsap.to(ring, { scale: 1.8, duration: 0.3, ease: 'power2.out' });
       gsap.to(dot,  { opacity: 0.4, duration: 0.2 });
@@ -520,20 +520,6 @@ function initScrollRevealEditorial() {
     });
   });
 
-  /* Skill tags : explosion de scale depuis le centre */
-  document.querySelectorAll('.skill-tags').forEach(container => {
-    const tags = container.querySelectorAll('.skill-tag');
-    if (!tags.length) return;
-    gsap.from(tags, {
-      scale: 0.65,
-      opacity: 0,
-      duration: 0.45,
-      stagger: 0.04,
-      ease: 'back.out(2)',
-      scrollTrigger: { trigger: container, start: 'top 87%' }
-    });
-  });
-
   /* Dates timeline : glissement depuis la gauche */
   document.querySelectorAll('.tl-date').forEach(el => {
     gsap.from(el, {
@@ -565,7 +551,7 @@ function initMagneticCards() {
   if (window.matchMedia('(pointer: coarse)').matches) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  document.querySelectorAll('.tl, .skill-category, .tool-cat, .passion-card').forEach(card => {
+  document.querySelectorAll('.tl, .tool-cat, .passion-card').forEach(card => {
     card.style.transformStyle = 'preserve-3d';
 
     card.addEventListener('mousemove', e => {
@@ -1031,31 +1017,9 @@ function initToolPanel() {
   const fallbackLong   = document.getElementById('fallback-long');
   if (!panel) return;
 
-  /* Marquer les skill-tags (#outils) qui ont une entrée dans la DB */
-  document.querySelectorAll('#outils .skill-tag').forEach(tag => {
-    const label = tag.textContent.trim();
-    if (toolsDatabase[label]) {
-      tag.setAttribute('data-tool', label);
-      tag.setAttribute('role', 'button');
-      tag.setAttribute('tabindex', '0');
-    }
-  });
-
-  /* Invite au-dessus de la grille #outils (une seule fois) */
-  const skillsGrid = document.querySelector('#outils .skills-grid');
-  if (skillsGrid && !skillsGrid.parentNode.querySelector('.skills-invite')) {
-    const invite = document.createElement('p');
-    invite.className = 'skills-invite';
-    invite.textContent = "Cliquez sur un outil pour l'explorer";
-    skillsGrid.parentNode.insertBefore(invite, skillsGrid);
-  }
-
   let fallbackTimer = null;
 
-  /*
-   * openPanel({ name, url, cat, short, long })
-   * Utilisé par skill-tags (#outils) ET tool-items (#logiciels)
-   */
+  /* openPanel({ name, url, cat, short, long }) */
   function openPanel({ name, url, cat, short = '', long = '' }) {
     /* Reset */
     clearTimeout(fallbackTimer);
@@ -1119,20 +1083,7 @@ function initToolPanel() {
     iframe.focus();
   });
 
-  /* Skill tags (#outils) */
-  document.querySelectorAll('.skill-tag[data-tool]').forEach(tag => {
-    const open = () => {
-      const name = tag.getAttribute('data-tool');
-      const d    = toolsDatabase[name];
-      if (d) openPanel({ name, url: d.url, cat: d.cat });
-    };
-    tag.addEventListener('click', open);
-    tag.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
-    });
-  });
-
-  /* Tool items (#logiciels) — remplace l'ancien modal texte */
+  /* Tool items (#logiciels) */
   document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
     btn.addEventListener('click', () => {
       openPanel({
