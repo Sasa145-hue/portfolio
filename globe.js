@@ -57,8 +57,20 @@
           { name: 'Looker Studio',    level: 72, desc: 'Rapports et tableaux de bord connectés aux sources de données.',               url: 'https://lookerstudio.google.com' },
         ]
       },
+      /* index 5 — Parcours (phi 1.0 rad ≈ 57°, theta 4.2 rad ≈ 241°) */
+      { label: 'Parcours', phi: 57, theta: 241,
+        subs: [
+          { name: 'Bachelor INSEEC', desc: 'Marketing Digital, Data & IA — Bordeaux 2024-2025',                  url: '#' },
+          { name: 'BTS NDRC',        desc: 'Négociation Digitalisation Relation Client — Bordeaux 2022-2024',   url: '#' },
+          { name: 'Bac Général',     desc: 'SES & LLCE — Bordeaux 2021-2022',                                   url: '#' },
+          { name: 'Atelier CUB',     desc: 'Alternance NDRC — Mérignac 2022-2024',                              url: '#' },
+          { name: 'Evasion Gym',     desc: 'Marketing Digital & Création Web — Eysines 2022-2025',              url: '#' },
+          { name: 'Ericsson',        desc: "Stage Télécom — Côte d'Ivoire 2017",                                url: '#' },
+        ]
+      },
     ],
-    mainEdges: [[0,1],[0,2],[1,2],[0,3],[1,4],[3,4],[2,4]],
+    /* [5,0] Parcours↔Marketing Digital  [5,1] Parcours↔Data&IA  [5,2] Parcours↔CRM */
+    mainEdges: [[0,1],[0,2],[1,2],[0,3],[1,4],[3,4],[2,4],[5,0],[5,1],[5,2]],
   };
 
   var DATA_PASSION = {
