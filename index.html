@@ -709,6 +709,67 @@
     <span>Marketing Digital &amp; Data &mdash; Bordeaux</span>
   </footer>
 
+  <!-- ═══════════════════════════════════
+       PANNEAU OUTIL — iframe overlay
+  ═══════════════════════════════════ -->
+  <div class="tool-panel" id="tool-panel" aria-hidden="true">
+
+    <div class="tool-panel-bar">
+      <div class="browser-dots">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </div>
+      <div class="browser-url">
+        <span class="url-lock">🔒</span>
+        <span class="url-display" id="url-display">analytics.google.com</span>
+      </div>
+      <button class="panel-close" id="panel-close" aria-label="Fermer">✕</button>
+    </div>
+
+    <div class="tool-panel-header">
+      <span class="tool-panel-name" id="tool-panel-name">Google Analytics</span>
+      <span class="tool-panel-cat"  id="tool-panel-cat">Data &amp; Analyse</span>
+    </div>
+
+    <div class="tool-frame-wrap" id="tool-frame-wrap">
+
+      <iframe
+        id="tool-iframe"
+        class="tool-iframe"
+        src=""
+        title="Aperçu outil"
+        loading="lazy"
+        allow="autoplay; fullscreen; xr-spatial-tracking"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+
+      <div class="iframe-overlay" id="iframe-overlay">
+        <div class="iframe-overlay-inner">
+          <div class="iframe-overlay-rings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+          </div>
+          <p>Cliquez pour activer le défilement et l'interaction</p>
+        </div>
+      </div>
+
+      <div class="tool-iframe-fallback" id="tool-iframe-fallback">
+        <div class="fallback-content">
+          <p class="fallback-name" id="fallback-name">Google Analytics</p>
+          <p class="fallback-blocked">Ce site ne peut pas être affiché en iframe.</p>
+          <a class="fallback-open" id="fallback-open" href="#" target="_blank" rel="noopener noreferrer">
+            Ouvrir le site officiel →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tool-panel-backdrop" id="tool-panel-backdrop"></div>
+
   <script src="script.js"></script>
   <script src="assets/three.min.js"></script>
   <script src="globe.js"></script>

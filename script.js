@@ -93,6 +93,7 @@ function initAll() {
   initScrollCircle();
   initModeToggle();
   initToolModal();
+  initToolPanel();
   initContactForm();
   initDownloadCV();
   if (window.__initGlobes) window.__initGlobes();
@@ -981,4 +982,154 @@ function generateCV() {
   doc.rect(0, 295, 210, 2, 'F');
 
   doc.save('CV_Salif_Lacan.pdf');
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PANNEAU OUTIL — iframe + overlay d'activation (pattern Mango Media)
+══════════════════════════════════════════════════════════════ */
+const toolsDatabase = {
+  /* Data & Analyse */
+  'Google Analytics':      { url: 'https://marketingplatform.google.com/about/analytics/', cat: 'Data & Analyse' },
+  'Power BI':              { url: 'https://powerbi.microsoft.com/fr-fr/', cat: 'Data & Analyse' },
+  'Excel / Google Sheets': { url: 'https://workspace.google.com/products/sheets/', cat: 'Data & Analyse' },
+  'Reporting':             { url: 'https://lookerstudio.google.com', cat: 'Data & Analyse' },
+  'Analyse données':       { url: 'https://datastudio.google.com', cat: 'Data & Analyse' },
+  /* Marketing Digital */
+  'Meta Ads':                   { url: 'https://www.facebook.com/business/ads', cat: 'Marketing Digital' },
+  'SEO':                        { url: 'https://search.google.com/search-console/about', cat: 'Marketing Digital' },
+  'Email Marketing':            { url: 'https://mailchimp.com', cat: 'Marketing Digital' },
+  'Community Management':       { url: 'https://buffer.com', cat: 'Marketing Digital' },
+  'Stratégie digitale':         { url: 'https://semrush.com', cat: 'Marketing Digital' },
+  'Digitalisation commerciale': { url: 'https://salesforce.com', cat: 'Marketing Digital' },
+  /* Outils & Plateformes */
+  'Microsoft 365':    { url: 'https://www.microsoft.com/fr-fr/microsoft-365', cat: 'Outils & Plateformes' },
+  'Google Workspace': { url: 'https://workspace.google.com', cat: 'Outils & Plateformes' },
+  'Figma':            { url: 'https://figma.com', cat: 'Outils & Plateformes' },
+  'Notion':           { url: 'https://notion.so', cat: 'Outils & Plateformes' },
+  'CMS / WordPress':  { url: 'https://wordpress.org', cat: 'Outils & Plateformes' },
+  'Canva':            { url: 'https://canva.com', cat: 'Outils & Plateformes' },
+  /* Relation Client & Vente */
+  'CRM':                    { url: 'https://hubspot.com', cat: 'Relation Client & Vente' },
+  'Vente multicanal':       { url: 'https://pipedrive.com', cat: 'Relation Client & Vente' },
+  'Prospection digitale':   { url: 'https://linkedin.com/sales', cat: 'Relation Client & Vente' },
+  'Communication multicanal':{ url: 'https://hootsuite.com', cat: 'Relation Client & Vente' },
+};
+
+function initToolPanel() {
+  const panel          = document.getElementById('tool-panel');
+  const backdrop       = document.getElementById('tool-panel-backdrop');
+  const closeBtn       = document.getElementById('panel-close');
+  const iframe         = document.getElementById('tool-iframe');
+  const urlDisplay     = document.getElementById('url-display');
+  const nameEl         = document.getElementById('tool-panel-name');
+  const catEl          = document.getElementById('tool-panel-cat');
+  const iframeOverlay  = document.getElementById('iframe-overlay');
+  const fallback       = document.getElementById('tool-iframe-fallback');
+  const fallbackOpen   = document.getElementById('fallback-open');
+  const fallbackName   = document.getElementById('fallback-name');
+  if (!panel) return;
+
+  /* Marquer les skill-tags qui ont une entrée dans la DB */
+  document.querySelectorAll('#outils .skill-tag').forEach(tag => {
+    const label = tag.textContent.trim();
+    if (toolsDatabase[label]) {
+      tag.setAttribute('data-tool', label);
+      tag.setAttribute('role', 'button');
+      tag.setAttribute('tabindex', '0');
+    }
+  });
+
+  /* Invite cliquable au-dessus de la grille (ajoutée une seule fois) */
+  const skillsGrid = document.querySelector('#outils .skills-grid');
+  if (skillsGrid && !skillsGrid.parentNode.querySelector('.skills-invite')) {
+    const invite = document.createElement('p');
+    invite.className = 'skills-invite';
+    invite.textContent = "Cliquez sur un outil pour l'explorer";
+    skillsGrid.parentNode.insertBefore(invite, skillsGrid);
+  }
+
+  let fallbackTimer = null;
+
+  function openPanel(toolName) {
+    const data = toolsDatabase[toolName];
+    if (!data) return;
+
+    /* Reset */
+    clearTimeout(fallbackTimer);
+    iframeOverlay.classList.remove('is-activated');
+    fallback.classList.remove('is-visible');
+    iframe.src = '';
+
+    /* Remplir */
+    nameEl.textContent       = toolName;
+    catEl.textContent        = data.cat;
+    fallbackName.textContent = toolName;
+    fallbackOpen.href        = data.url;
+    urlDisplay.textContent   = data.url
+      .replace(/^https?:\/\//, '').split('/')[0];
+
+    /* Charger l'iframe */
+    iframe.src = data.url;
+
+    /* Fallback si l'iframe ne se charge pas en 6 s */
+    fallbackTimer = setTimeout(() => {
+      fallback.classList.add('is-visible');
+    }, 6000);
+
+    iframe.onload = () => {
+      clearTimeout(fallbackTimer);
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || !doc.body) throw new Error('blocked');
+      } catch (_) {
+        fallback.classList.add('is-visible');
+        iframeOverlay.classList.add('is-activated');
+      }
+    };
+
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    backdrop.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function closePanel() {
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    backdrop.classList.remove('is-open');
+    document.body.style.overflow = '';
+    clearTimeout(fallbackTimer);
+
+    /* Vider l'iframe après la transition */
+    setTimeout(() => {
+      iframe.src = '';
+      iframeOverlay.classList.remove('is-activated');
+      fallback.classList.remove('is-visible');
+    }, 750);
+  }
+
+  /* Overlay → activer l'iframe */
+  iframeOverlay.addEventListener('click', () => {
+    iframeOverlay.classList.add('is-activated');
+    iframe.focus();
+  });
+
+  /* Skill tags */
+  document.querySelectorAll('.skill-tag[data-tool]').forEach(tag => {
+    tag.addEventListener('click', () => openPanel(tag.getAttribute('data-tool')));
+    tag.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openPanel(tag.getAttribute('data-tool'));
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', closePanel);
+  backdrop.addEventListener('click', closePanel);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
+  });
 }
