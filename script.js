@@ -1,12 +1,12 @@
+'use strict';
+
 /* ══════════════════════════════════════════════════════════════
    LOADER
 ══════════════════════════════════════════════════════════════ */
-(function initLoader() {
-  'use strict';
-
-  const loader  = document.getElementById('loader');
-  const bar     = document.getElementById('loader-bar');
-  const pct     = document.getElementById('loader-percent');
+(function() {
+  const loader = document.getElementById('loader');
+  const bar    = document.getElementById('loader-bar');
+  const pct    = document.getElementById('loader-percent');
 
   document.body.classList.add('is-loading');
 
@@ -14,44 +14,43 @@
 
   function step() {
     const inc = progress < 70
-      ? (Math.random() * 14 + 4)
-      : progress < 90
-        ? (Math.random() * 4 + 1)
-        : (Math.random() * 1.5 + 0.5);
+      ? Math.random() * 14 + 5
+      : progress < 92
+        ? Math.random() * 4 + 1
+        : Math.random() * 1.2 + 0.3;
 
     progress = Math.min(progress + inc, 100);
-
-    bar.style.width      = progress + '%';
-    pct.textContent      = Math.round(progress) + '%';
+    bar.style.width  = progress + '%';
+    pct.textContent  = Math.round(progress) + '%';
 
     if (progress < 100) {
-      setTimeout(step, 60 + Math.random() * 60);
+      setTimeout(step, 55 + Math.random() * 65);
     } else {
-      setTimeout(finishLoader, 350);
+      setTimeout(finishLoader, 320);
     }
   }
 
   function finishLoader() {
     loader.classList.add('is-done');
     document.body.classList.remove('is-loading');
-    initPage();
+    initAll();
   }
 
-  setTimeout(step, 120);
+  setTimeout(step, 100);
 })();
 
 
 /* ══════════════════════════════════════════════════════════════
-   INIT PAGE — called after loader completes
+   INIT GLOBAL
 ══════════════════════════════════════════════════════════════ */
-function initPage() {
+function initAll() {
   setYear();
-  initNav();
-  initBurger();
-  initHeroTitle();
+  initCursor();
+  initHeroLines();
   initTagRotation();
+  initParallax();
   initReveal();
-  initCounters();
+  initModeToggle();
   initContactForm();
 }
 
@@ -66,76 +65,77 @@ function setYear() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   NAV — sticky behaviour on scroll
+   CURSEUR CARTOON CUSTOM
 ══════════════════════════════════════════════════════════════ */
-function initNav() {
-  const nav = document.getElementById('nav');
-  if (!nav) return;
+function initCursor() {
+  const cursor = document.getElementById('cursor');
+  if (!cursor) return;
 
-  let ticking = false;
+  /* Sur mobile/tactile, on cache le curseur custom */
+  if (window.matchMedia('(pointer: coarse)').matches) {
+    cursor.style.display = 'none';
+    document.body.style.cursor = 'auto';
+    document.querySelectorAll('*').forEach(el => el.style.cursor = '');
+    return;
+  }
 
-  function onScroll() {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        nav.classList.toggle('is-scrolled', window.scrollY > 30);
-        ticking = false;
-      });
-      ticking = true;
+  const ring = cursor.querySelector('.cursor-ring');
+  const dot  = cursor.querySelector('.cursor-dot');
+
+  let mx = -100, my = -100; // position cible souris
+  let rx = -100, ry = -100; // position réelle du ring (lag)
+  let dx = -100, dy = -100; // position réelle du dot (plus rapide)
+
+  /* Lag du ring : 0.1 = plus lent/cartoon, dot : 0.25 */
+  const RING_EASE = 0.1;
+  const DOT_EASE  = 0.3;
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  function loop() {
+    rx += (mx - rx) * RING_EASE;
+    ry += (my - ry) * RING_EASE;
+    dx += (mx - dx) * DOT_EASE;
+    dy += (my - dy) * DOT_EASE;
+
+    cursor.style.transform = `translate(${dx}px, ${dy}px)`;
+    ring.style.transform   = `translate(${rx - dx}px, ${ry - dy}px) translate(-50%, -50%)`;
+    dot.style.transform    = `translate(-50%, -50%)`;
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  /* Hover sur interactifs */
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest('a, button, input, textarea, [role="button"]')) {
+      document.body.classList.add('cursor-hover');
     }
-  }
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('a, button, input, textarea, [role="button"]')) {
+      document.body.classList.remove('cursor-hover');
+    }
+  });
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  /* Click press */
+  document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+
+  /* Masquer quand la souris quitte la fenêtre */
+  document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
+  document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   BURGER MENU
+   HERO — LIGNES TITRE
 ══════════════════════════════════════════════════════════════ */
-function initBurger() {
-  const burger = document.getElementById('burger');
-  const menu   = document.getElementById('mobile-menu');
-  if (!burger || !menu) return;
-
-  function open() {
-    burger.classList.add('is-open');
-    menu.classList.add('is-open');
-    menu.setAttribute('aria-hidden', 'false');
-    burger.setAttribute('aria-expanded', 'true');
-    burger.setAttribute('aria-label', 'Fermer le menu');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function close() {
-    burger.classList.remove('is-open');
-    menu.classList.remove('is-open');
-    menu.setAttribute('aria-hidden', 'true');
-    burger.setAttribute('aria-expanded', 'false');
-    burger.setAttribute('aria-label', 'Ouvrir le menu');
-    document.body.style.overflow = '';
-  }
-
-  burger.addEventListener('click', () => {
-    burger.classList.contains('is-open') ? close() : open();
-  });
-
-  menu.querySelectorAll('.mobile-link').forEach(link => {
-    link.addEventListener('click', close);
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && burger.classList.contains('is-open')) close();
-  });
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   HERO TITLE — lines slide in
-══════════════════════════════════════════════════════════════ */
-function initHeroTitle() {
-  const lines = document.querySelectorAll('.hero-title .line');
-
-  lines.forEach(line => {
+function initHeroLines() {
+  document.querySelectorAll('.hero-name .line').forEach(line => {
     const delay = parseInt(line.dataset.delay || '0', 10);
     setTimeout(() => line.classList.add('is-visible'), delay);
   });
@@ -143,24 +143,91 @@ function initHeroTitle() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   TAG ROTATION — hero specialties
+   HERO — ROTATION DE TAGS
 ══════════════════════════════════════════════════════════════ */
 function initTagRotation() {
-  const tags = document.querySelectorAll('.hero-tags .tag');
-  if (tags.length < 2) return;
+  function rotateSet(container) {
+    const tags = container ? container.querySelectorAll('.tag') : [];
+    if (tags.length < 2) return null;
+    let current = 0;
+    return setInterval(() => {
+      tags[current].classList.remove('active');
+      current = (current + 1) % tags.length;
+      tags[current].classList.add('active');
+    }, 2600);
+  }
 
-  let current = 0;
+  let timerPro   = rotateSet(document.querySelector('.hero-tags-pro'));
+  let timerPerso = rotateSet(document.querySelector('.hero-tags-perso'));
 
-  setInterval(() => {
-    tags[current].classList.remove('active');
-    current = (current + 1) % tags.length;
-    tags[current].classList.add('active');
-  }, 2400);
+  /* Reset les timers quand le mode change */
+  document.getElementById('mode-btn').addEventListener('click', () => {
+    clearInterval(timerPro);
+    clearInterval(timerPerso);
+
+    /* Reset active states */
+    document.querySelectorAll('.hero-tags .tag').forEach((t, i) => {
+      t.classList.toggle('active', i === 0);
+    });
+
+    timerPro   = rotateSet(document.querySelector('.hero-tags-pro'));
+    timerPerso = rotateSet(document.querySelector('.hero-tags-perso'));
+  });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   SCROLL REVEAL — IntersectionObserver
+   HERO — PARALLAX SOURIS
+══════════════════════════════════════════════════════════════ */
+function initParallax() {
+  const hero   = document.querySelector('.hero');
+  if (!hero) return;
+
+  /* Éléments avec data-depth */
+  const parallaxEls = hero.querySelectorAll('[data-depth]');
+
+  let cx = window.innerWidth  / 2;
+  let cy = window.innerHeight / 2;
+
+  /* Recalcule le centre si resize */
+  window.addEventListener('resize', () => {
+    cx = window.innerWidth  / 2;
+    cy = window.innerHeight / 2;
+  }, { passive: true });
+
+  let ticking = false;
+
+  hero.addEventListener('mousemove', (e) => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const dx = (e.clientX - cx) / cx; // -1 → 1
+      const dy = (e.clientY - cy) / cy; // -1 → 1
+
+      parallaxEls.forEach(el => {
+        const depth = parseFloat(el.dataset.depth);
+        const tx = dx * depth * 40;
+        const ty = dy * depth * 28;
+        el.style.transform = `translate(${tx}px, ${ty}px)`;
+      });
+
+      ticking = false;
+    });
+  });
+
+  /* Retour doux au centre quand la souris quitte le hero */
+  hero.addEventListener('mouseleave', () => {
+    parallaxEls.forEach(el => {
+      el.style.transition = 'transform 1.2s ease';
+      el.style.transform  = 'translate(0, 0)';
+      setTimeout(() => { el.style.transition = ''; }, 1200);
+    });
+  });
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL REVEAL
 ══════════════════════════════════════════════════════════════ */
 function initReveal() {
   if (!('IntersectionObserver' in window)) {
@@ -168,88 +235,67 @@ function initReveal() {
     return;
   }
 
-  /* Stagger delay for grid children */
-  const staggerMap = [
-    { selector: '.exp-card',       base: 0, step: 90 },
-    { selector: '.skill-category', base: 0, step: 70 },
-    { selector: '.metric-item',    base: 0, step: 70 },
-  ];
-
-  staggerMap.forEach(({ selector, base, step }) => {
-    document.querySelectorAll(selector).forEach((el, i) => {
-      el.style.transitionDelay = (base + i * step) + 'ms';
+  /* Stagger sur les grilles */
+  [
+    { sel: '.tl-item',       step: 80  },
+    { sel: '.skill-cat',     step: 70  },
+    { sel: '.passion-card',  step: 80  },
+    { sel: '.projet-card',   step: 90  },
+    { sel: '.contact-card',  step: 60  },
+  ].forEach(({ sel, step }) => {
+    document.querySelectorAll(sel).forEach((el, i) => {
+      el.style.transitionDelay = (i * step) + 'ms';
     });
   });
 
-  const observer = new IntersectionObserver((entries) => {
+  const obs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
+        obs.unobserve(entry.target);
       }
     });
-  }, {
-    threshold:  0.08,
-    rootMargin: '0px 0px -40px 0px',
-  });
+  }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   ANIMATED COUNTERS
+   BOUTON MODE PRO / PERSO
 ══════════════════════════════════════════════════════════════ */
-function initCounters() {
-  if (!('IntersectionObserver' in window)) return;
+function initModeToggle() {
+  const btn = document.getElementById('mode-btn');
+  if (!btn) return;
 
-  const counters = document.querySelectorAll('.metric-num[data-target]');
-  if (!counters.length) return;
+  btn.addEventListener('click', () => {
+    const isPerso = document.body.classList.toggle('mode-perso');
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-
-      const el     = entry.target;
-      const target = parseFloat(el.dataset.target);
-      const duration = 1600;
-      const start    = performance.now();
-
-      function ease(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      }
-
-      function frame(now) {
-        const elapsed = Math.min((now - start) / duration, 1);
-        const value   = Math.round(ease(elapsed) * target);
-        el.textContent = value;
-        if (elapsed < 1) requestAnimationFrame(frame);
-        else el.textContent = target;
-      }
-
-      requestAnimationFrame(frame);
-      observer.unobserve(el);
-    });
-  }, { threshold: 0.4 });
-
-  counters.forEach(el => observer.observe(el));
+    /* Re-trigger les reveals dans le nouveau contenu visible */
+    setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.92) {
+          el.classList.add('is-visible');
+        }
+      });
+    }, 50);
+  });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   CONTACT FORM
+   FORMULAIRE DE CONTACT
 ══════════════════════════════════════════════════════════════ */
 function initContactForm() {
   const form = document.getElementById('contact-form');
   if (!form) return;
 
-  const btn      = form.querySelector('.btn-submit');
-  const btnText  = btn.querySelector('.btn-text');
+  const btn = form.querySelector('.btn-submit');
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    /* Basic client-side validation */
     const name    = form.querySelector('#name').value.trim();
     const email   = form.querySelector('#email').value.trim();
     const message = form.querySelector('#message').value.trim();
@@ -260,23 +306,21 @@ function initContactForm() {
       return;
     }
 
-    /* Visual feedback */
     btn.classList.add('is-sent');
     btn.disabled = true;
-    btn.style.background = '#22c55e';
+    btn.style.background = '#4ade80';
 
-    /* Reset after delay */
     setTimeout(() => {
       btn.classList.remove('is-sent');
-      btn.disabled = false;
+      btn.disabled         = false;
       btn.style.background = '';
       form.reset();
     }, 3500);
 
     /*
-      ⚠️ Connectez ici votre backend / service email :
-      Ex : fetch('/api/contact', { method: 'POST', body: JSON.stringify({ name, email, message }) })
-      Ex : intégration Formspree → action="https://formspree.io/f/YOUR_ID"
+      Connecter ici votre service d'envoi :
+      fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ name, email, message }) })
     */
   });
 }
