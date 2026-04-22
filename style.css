@@ -503,16 +503,37 @@ body.mode-perso .perso-section { display: block; }
 .tool-list { display: flex; flex-direction: column; gap: .85rem; }
 
 .tool-item {
-  display: flex; flex-direction: column; gap: .2rem;
+  display: flex; align-items: center; gap: 1rem;
   padding: .9rem 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
+  width: 100%; text-align: left;
   transition: background .3s, border-color .3s;
 }
 .tool-item:hover {
   background: var(--accent-soft);
   border-color: var(--border-acc);
+}
+
+.tool-logo {
+  width: 28px; height: 28px;
+  flex-shrink: 0; object-fit: contain;
+  filter: invert(1) brightness(1.4);
+  transition: filter .65s ease;
+}
+body.mode-perso .tool-logo {
+  filter: invert(15%) sepia(50%) saturate(1600%) hue-rotate(238deg) brightness(55%);
+}
+
+.tool-logo-gephi {
+  width: 28px; height: 28px; flex-shrink: 0;
+  color: var(--accent); transition: color .65s ease;
+}
+.tool-logo-gephi svg { width: 100%; height: 100%; }
+
+.tool-text {
+  display: flex; flex-direction: column; gap: .15rem; flex: 1;
 }
 
 .tool-name {
@@ -523,6 +544,12 @@ body.mode-perso .perso-section { display: block; }
   font-size: .76rem; color: var(--text-dim); line-height: 1.5;
   transition: color .65s ease;
 }
+
+.tool-arrow {
+  font-size: .95rem; color: var(--text-faint); flex-shrink: 0;
+  transition: color .3s, transform .3s;
+}
+.tool-item:hover .tool-arrow { color: var(--accent); transform: translateX(4px); }
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -762,6 +789,130 @@ textarea { resize: vertical; min-height: 130px; }
   .parcours-grid { grid-template-columns: 1fr; gap: 3.5rem; }
   .passions-grid { grid-template-columns: 1fr; }
   .f-row         { grid-template-columns: 1fr; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   TOOLS HINT
+══════════════════════════════════════════════════════════════ */
+.tools-hint {
+  font-size: .76rem; color: var(--text-faint);
+  letter-spacing: .1em; margin-bottom: 2.5rem;
+  transition: color .65s ease;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PHOTO FALLBACK
+══════════════════════════════════════════════════════════════ */
+.photo-fallback {
+  display: none;
+  width: 100%; height: 100%;
+  align-items: center; justify-content: center;
+  font-family: var(--font-t); font-size: 5rem;
+  color: var(--accent); background: var(--accent-soft);
+  letter-spacing: .05em;
+  transition: color .65s ease, background .65s ease;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PASSION GIF
+══════════════════════════════════════════════════════════════ */
+.passion-gif-wrap {
+  width: 100%; max-height: 240px;
+  border-radius: 8px; overflow: hidden;
+  margin-bottom: 1.5rem;
+  background: var(--bg-alt);
+}
+.passion-gif {
+  width: 100%; height: 240px;
+  object-fit: cover; display: block;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   RIDEAU DE TRANSITION
+══════════════════════════════════════════════════════════════ */
+#curtain {
+  position: fixed; inset: 0;
+  z-index: 7000;
+  background: var(--accent);
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+  transition: background .65s ease;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   MODAL OUTIL
+══════════════════════════════════════════════════════════════ */
+#tool-modal {
+  position: fixed; inset: 0; z-index: 6000;
+  display: flex; align-items: center; justify-content: center;
+}
+#tool-modal[hidden] { display: none; }
+
+.modal-bg {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-box {
+  position: relative; z-index: 1;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-acc);
+  border-radius: 14px;
+  padding: 2.5rem 2.75rem;
+  max-width: 480px; width: 90%;
+  transition: background .65s ease, border-color .65s ease;
+  animation: modalIn .35s var(--ease) both;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(28px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close {
+  position: absolute; top: 1.1rem; right: 1.25rem;
+  background: transparent; border: none;
+  font-size: 1.6rem; line-height: 1;
+  color: var(--text-faint); transition: color .2s;
+  padding: .2rem .5rem;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-logo-big {
+  width: 52px; height: 52px;
+  margin-bottom: 1.25rem; object-fit: contain;
+  filter: invert(1) brightness(1.4);
+  transition: filter .65s ease;
+}
+body.mode-perso .modal-logo-big {
+  filter: invert(15%) sepia(50%) saturate(1600%) hue-rotate(238deg) brightness(55%);
+}
+.modal-logo-big[src=""] { display: none; }
+
+.modal-tool-name {
+  font-family: var(--font-t);
+  font-size: 2rem; letter-spacing: .05em; text-transform: uppercase;
+  margin-bottom: .85rem; line-height: 1;
+}
+
+.modal-short {
+  font-size: .88rem; font-weight: 500;
+  color: var(--accent); margin-bottom: .75rem;
+  transition: color .65s ease;
+}
+
+.modal-long {
+  font-size: .82rem; color: var(--text-dim);
+  line-height: 1.7; transition: color .65s ease;
 }
 
 

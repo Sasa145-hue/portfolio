@@ -39,6 +39,7 @@ function initAll() {
   initParallax();
   initReveal();
   initModeToggle();
+  initToolModal();
   initContactForm();
 }
 
@@ -228,81 +229,97 @@ function initReveal() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   MODE TOGGLE — PRO / MOI avec animation de switch
+   MODE TOGGLE — PRO / PASSION avec rideau de couleur
 ══════════════════════════════════════════════════════════════ */
 function initModeToggle() {
-  const btn       = document.getElementById('mode-btn');
-  const optPro    = document.getElementById('opt-pro');
-  const optPerso  = document.getElementById('opt-perso');
-  const photo     = document.getElementById('hero-img');
+  const btn     = document.getElementById('mode-btn');
+  const optPro  = document.getElementById('opt-pro');
+  const optPerso = document.getElementById('opt-perso');
+  const curtain = document.getElementById('curtain');
   if (!btn) return;
 
-  /* État initial : PRO actif */
   optPro.classList.add('is-active');
 
+  let busy = false;
+
   btn.addEventListener('click', () => {
+    if (busy) return;
+    busy = true;
+
     const goingPerso = !document.body.classList.contains('mode-perso');
-
-    /* 1. Blur sur la photo */
-    if (photo) {
-      photo.style.transition = 'filter .35s ease, opacity .35s ease';
-      photo.style.filter     = 'blur(14px)';
-      photo.style.opacity    = '0.25';
-    }
-
-    /* 2. Fade out les sections actuelles */
     const outSels = goingPerso ? '.pro-section'   : '.perso-section';
     const inSels  = goingPerso ? '.perso-section' : '.pro-section';
 
-    document.querySelectorAll(outSels).forEach(el => {
-      el.style.transition = 'opacity .28s ease';
-      el.style.opacity    = '0';
-    });
+    /* 1. Rideau entre de gauche */
+    curtain.style.transition = 'transform .38s cubic-bezier(0.77,0,0.175,1)';
+    curtain.style.transformOrigin = 'left center';
+    curtain.style.transform = 'scaleX(1)';
 
     setTimeout(() => {
-      /* 3. Switche le mode */
+      /* 2. Tout switcher derrière le rideau */
       document.body.classList.toggle('mode-perso');
 
-      /* 4. Masque les anciennes, montre les nouvelles */
-      document.querySelectorAll(outSels).forEach(el => {
-        el.style.display = 'none';
-        el.style.opacity = '';
-        el.style.transition = '';
+      document.querySelectorAll(outSels).forEach(el => { el.style.display = 'none'; });
+      document.querySelectorAll(inSels).forEach(el  => { el.style.display = 'block'; });
+
+      optPro.classList.toggle('is-active',   !goingPerso);
+      optPerso.classList.toggle('is-active',  goingPerso);
+
+      if (window.__resetTags) window.__resetTags();
+
+      document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.92)
+          el.classList.add('is-visible');
       });
-      document.querySelectorAll(inSels).forEach(el => {
-        el.style.display  = 'block';
-        el.style.opacity  = '0';
-        el.style.transition = 'opacity .4s ease';
-        requestAnimationFrame(() => { el.style.opacity = '1'; });
-      });
 
-      /* 5. Update bouton */
-      optPro.classList.toggle('is-active',    !goingPerso);
-      optPerso.classList.toggle('is-active',   goingPerso);
+      /* 3. Rideau sort par la droite */
+      curtain.style.transformOrigin = 'right center';
+      curtain.style.transform = 'scaleX(0)';
 
-      /* 6. Déblur photo */
-      setTimeout(() => {
-        if (photo) {
-          photo.style.filter  = 'blur(0)';
-          photo.style.opacity = '1';
-          setTimeout(() => {
-            photo.style.transition = '';
-            photo.style.filter     = '';
-            photo.style.opacity    = '';
-          }, 400);
-        }
+      setTimeout(() => { busy = false; }, 400);
+    }, 400);
+  });
+}
 
-        /* 7. Reset tags */
-        if (window.__resetTags) window.__resetTags();
 
-        /* 8. Re-trigger reveals dans les nouvelles sections */
-        document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
-          const r = el.getBoundingClientRect();
-          if (r.top < window.innerHeight * 0.92) el.classList.add('is-visible');
-        });
-      }, 200);
+/* ══════════════════════════════════════════════════════════════
+   MODAL OUTIL
+══════════════════════════════════════════════════════════════ */
+function initToolModal() {
+  const modal      = document.getElementById('tool-modal');
+  const modalBg    = document.getElementById('modal-bg');
+  const modalClose = document.getElementById('modal-close');
+  const modalLogo  = document.getElementById('modal-logo');
+  const modalName  = document.getElementById('modal-name');
+  const modalShort = document.getElementById('modal-short');
+  const modalLong  = document.getElementById('modal-long');
+  if (!modal) return;
 
-    }, 280);
+  function openModal(btn) {
+    const logo  = btn.dataset.logo  || '';
+    modalLogo.src              = logo;
+    modalLogo.style.display    = logo ? '' : 'none';
+    modalName.textContent      = btn.dataset.name  || '';
+    modalShort.innerHTML       = btn.dataset.short || '';
+    modalLong.innerHTML        = btn.dataset.long  || '';
+    modal.hidden               = false;
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.tool-item').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn));
+  });
+
+  modalClose.addEventListener('click', closeModal);
+  modalBg.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !modal.hidden) closeModal();
   });
 }
 
