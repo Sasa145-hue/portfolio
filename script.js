@@ -37,7 +37,9 @@ function initAll() {
   initHeroLines();
   initTagRotation();
   initParallax();
+  initLetterSplit();
   initReveal();
+  initScrollCircle();
   initModeToggle();
   initToolModal();
   initContactForm();
@@ -178,7 +180,7 @@ function initParallax() {
       const dy = (e.clientY - cy) / cy;
       els.forEach(el => {
         const d  = parseFloat(el.dataset.depth);
-        el.style.transform = `translate(${dx * d * 42}px, ${dy * d * 30}px)`;
+        el.style.transform = `translate(${dx * d * 90}px, ${dy * d * 65}px)`;
       });
       ticking = false;
     });
@@ -224,7 +226,56 @@ function initReveal() {
     });
   }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  document.querySelectorAll('.reveal:not(.split-applied)').forEach(el => obs.observe(el));
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   CERCLE DE SCROLL DYNAMIQUE
+══════════════════════════════════════════════════════════════ */
+function initScrollCircle() {
+  const fill = document.getElementById('scroll-ring-fill');
+  if (!fill) return;
+  const circ = 100.53; /* 2π × 16 */
+
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+    fill.style.strokeDashoffset = circ * (1 - pct);
+  }, { passive: true });
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   ANIMATION LETTRE PAR LETTRE — titres de section
+══════════════════════════════════════════════════════════════ */
+function initLetterSplit() {
+  if (!('IntersectionObserver' in window)) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      obs.unobserve(entry.target);
+      entry.target.querySelectorAll('.char').forEach((c, i) => {
+        setTimeout(() => c.classList.add('is-visible'), i * 38);
+      });
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.s-title').forEach(el => {
+    const text = el.textContent;
+    el.innerHTML = [...text].map(ch => {
+      const s = document.createElement('span');
+      s.className = 'char';
+      s.textContent = ch === ' ' ? ' ' : ch;
+      return s.outerHTML;
+    }).join('');
+    el.classList.add('split-applied');
+    /* Reset les styles hérités de .reveal */
+    el.style.opacity  = '1';
+    el.style.transform = 'none';
+    obs.observe(el);
+  });
 }
 
 
@@ -293,16 +344,20 @@ function initToolModal() {
   const modalName  = document.getElementById('modal-name');
   const modalShort = document.getElementById('modal-short');
   const modalLong  = document.getElementById('modal-long');
+  const modalUrl   = document.getElementById('modal-url');
   if (!modal) return;
 
   function openModal(btn) {
-    const logo  = btn.dataset.logo  || '';
-    modalLogo.src              = logo;
-    modalLogo.style.display    = logo ? '' : 'none';
-    modalName.textContent      = btn.dataset.name  || '';
-    modalShort.innerHTML       = btn.dataset.short || '';
-    modalLong.innerHTML        = btn.dataset.long  || '';
-    modal.hidden               = false;
+    const logo = btn.dataset.logo || '';
+    const url  = btn.dataset.url  || '';
+    modalLogo.src           = logo;
+    modalLogo.style.display = logo ? '' : 'none';
+    modalName.textContent   = btn.dataset.name  || '';
+    modalShort.innerHTML    = btn.dataset.short || '';
+    modalLong.innerHTML     = btn.dataset.long  || '';
+    if (url) { modalUrl.href = url; modalUrl.hidden = false; }
+    else      { modalUrl.hidden = true; }
+    modal.hidden              = false;
     document.body.style.overflow = 'hidden';
     modalClose.focus();
   }
