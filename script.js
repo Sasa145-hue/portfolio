@@ -47,6 +47,7 @@ function initAll() {
   initModeToggle();
   initToolModal();
   initContactForm();
+  if (window.__initGlobes) window.__initGlobes();
 }
 
 

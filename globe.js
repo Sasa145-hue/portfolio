@@ -614,9 +614,11 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     INITIALISATION
+     INITIALISATION — appelée par initAll() après le loader
   ═══════════════════════════════════════════════════════════ */
-  initGlobe('globe-pro',   DATA_PRO);
-  initGlobe('globe-perso', DATA_PASSION);
+  window.__initGlobes = function () {
+    initGlobe('globe-pro',   DATA_PRO);
+    initGlobe('globe-perso', DATA_PASSION);
+  };
 
 })();
