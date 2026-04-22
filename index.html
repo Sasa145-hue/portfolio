@@ -96,10 +96,13 @@
       <!-- Photo droite -->
       <div class="hero-photo-wrap" data-depth="0.05">
         <div class="hero-photo-ring" id="photo-ring">
-          <img id="hero-img" src="photo.jpg" alt="Salif Lacan"
-               class="hero-photo"
-               onerror="this.style.display='none';document.getElementById('photo-fallback').style.display='flex'">
-          <div id="photo-fallback" class="photo-fallback">SL</div>
+          <div class="photo-tilt-inner" id="photo-tilt">
+            <img id="hero-img" src="photo.jpg" alt="Salif Lacan"
+                 class="hero-photo"
+                 onerror="this.style.display='none';document.getElementById('photo-fallback').style.display='flex'">
+            <div id="photo-fallback" class="photo-fallback">SL</div>
+          </div>
+          <div class="photo-glare" id="photo-glare" aria-hidden="true"></div>
         </div>
         <div class="photo-glow" aria-hidden="true"></div>
       </div>
@@ -432,6 +435,8 @@
        PASSION — À PROPOS
   ═══════════════════════════════════ -->
   <section id="apropos" class="section perso-section">
+    <div class="apropos-bg-orb" aria-hidden="true"></div>
+    <div class="apropos-sphere-deco" aria-hidden="true"></div>
     <div class="s-head">
       <span class="s-num">01</span>
       <h2 class="s-title reveal">À Propos</h2>

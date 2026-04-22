@@ -37,8 +37,12 @@ function initAll() {
   initHeroLines();
   initTagRotation();
   initParallax();
+  initPhotoTilt();
+  initParticles();
   initLetterSplit();
   initReveal();
+  initSectionWipe();
+  initAproposOrb();
   initScrollCircle();
   initModeToggle();
   initToolModal();
@@ -106,6 +110,154 @@ function initCursor() {
   document.addEventListener('mouseup',   () => document.body.classList.remove('cur-click'));
   document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
   document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PHOTO — TILT 3D + GLARE + FLOAT
+══════════════════════════════════════════════════════════════ */
+function initPhotoTilt() {
+  const ring  = document.getElementById('photo-ring');
+  const tilt  = document.getElementById('photo-tilt');
+  const glare = document.getElementById('photo-glare');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!ring || !tilt || window.matchMedia('(pointer: coarse)').matches) return;
+  /* En reduced motion, juste garder le float sans tilt ni glare */
+
+  /* Float JS (remplace animation CSS floatY) */
+  let floatT = 0;
+  let tiltX = 0, tiltY = 0;
+  let targetTX = 0, targetTY = 0;
+  let isHovered = false;
+
+  (function floatLoop() {
+    floatT += 0.012;
+    const floatY = Math.sin(floatT) * 14;
+
+    /* Interpolation douce vers la cible tilt */
+    tiltX += (targetTX - tiltX) * 0.08;
+    tiltY += (targetTY - tiltY) * 0.08;
+
+    ring.style.transform = `translateY(${floatY}px) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+
+    /* Ombre dynamique simulant la lumière */
+    const sx = -tiltY * 1.8;
+    const sy =  tiltX * 1.8;
+    ring.style.boxShadow = `${sx}px ${sy}px 40px var(--accent-glow), 0 0 0 10px var(--accent-soft), 0 0 70px var(--accent-glow)`;
+
+    requestAnimationFrame(floatLoop);
+  })();
+
+  if (!reduced) {
+    ring.addEventListener('mousemove', e => {
+      const rect = ring.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width  / 2) / (rect.width  / 2);
+      const y = (e.clientY - rect.top  - rect.height / 2) / (rect.height / 2);
+      targetTY =  x * 13;
+      targetTX = -y * 13;
+      if (glare) {
+        const gx = ((x + 1) / 2 * 100).toFixed(1);
+        const gy = ((y + 1) / 2 * 100).toFixed(1);
+        glare.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.22) 0%, transparent 60%)`;
+      }
+    });
+    ring.addEventListener('mouseleave', () => {
+      targetTX = 0; targetTY = 0;
+      if (glare) glare.style.background = '';
+    });
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   HERO — PARTICULES FLOTTANTES
+══════════════════════════════════════════════════════════════ */
+function initParticles() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  const container = document.createElement('div');
+  container.className = 'hero-particles';
+  hero.insertBefore(container, hero.firstChild);
+
+  const count = 7;
+  const particles = [];
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 100}%;
+      opacity:${Math.random() * 0.45 + 0.1};
+    `;
+    container.appendChild(p);
+    particles.push({
+      el: p,
+      x: parseFloat(p.style.left),
+      y: parseFloat(p.style.top),
+      vx: (Math.random() - 0.5) * 0.018,
+      vy: (Math.random() - 0.5) * 0.012,
+    });
+  }
+
+  (function drift() {
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -2)  p.x = 102;
+      if (p.x > 102) p.x = -2;
+      if (p.y < -2)  p.y = 102;
+      if (p.y > 102) p.y = -2;
+      p.el.style.left = p.x + '%';
+      p.el.style.top  = p.y + '%';
+    });
+    requestAnimationFrame(drift);
+  })();
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   WIPE DIAGONAL — sections section-alt
+══════════════════════════════════════════════════════════════ */
+function initSectionWipe() {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.section-alt').forEach(el => el.classList.add('diag-visible'));
+    return;
+  }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('diag-visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.section-alt').forEach(el => obs.observe(el));
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   À PROPOS — expansion orbe
+══════════════════════════════════════════════════════════════ */
+function initAproposOrb() {
+  const section = document.getElementById('apropos');
+  if (!section) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        section.classList.add('is-expanded');
+        obs.unobserve(section);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  obs.observe(section);
 }
 
 
@@ -311,7 +463,17 @@ function initModeToggle() {
       document.body.classList.toggle('mode-perso');
 
       document.querySelectorAll(outSels).forEach(el => { el.style.display = 'none'; });
-      document.querySelectorAll(inSels).forEach(el  => { el.style.display = 'block'; });
+      document.querySelectorAll(inSels).forEach(el  => {
+        el.style.display = 'block';
+        /* Re-déclencher le wipe diagonal si pas encore visible */
+        if (el.classList.contains('section-alt') && !el.classList.contains('diag-visible')) {
+          requestAnimationFrame(() => el.classList.add('diag-visible'));
+        }
+        /* Re-déclencher l'orbe à propos */
+        if (el.id === 'apropos' && !el.classList.contains('is-expanded')) {
+          setTimeout(() => el.classList.add('is-expanded'), 150);
+        }
+      });
 
       optPro.classList.toggle('is-active',   !goingPerso);
       optPerso.classList.toggle('is-active',  goingPerso);
