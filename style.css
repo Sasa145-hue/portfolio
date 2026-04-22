@@ -1545,8 +1545,16 @@ body.mode-perso .modal-logo-big {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 2.5rem; letter-spacing: 0.08em; color: #fff;
 }
+.fallback-short {
+  font-size: 0.82rem; font-weight: 500;
+  color: #8B5CF6; line-height: 1.5; margin-top: -0.25rem;
+}
+.fallback-long {
+  font-size: 0.78rem; color: rgba(255, 255, 255, 0.45);
+  line-height: 1.7; max-width: 320px; text-align: center;
+}
 .fallback-blocked {
-  font-size: 0.82rem; color: rgba(255, 255, 255, 0.35); line-height: 1.6;
+  font-size: 0.72rem; color: rgba(255, 255, 255, 0.2); line-height: 1.6;
 }
 .fallback-open {
   display: inline-block;
