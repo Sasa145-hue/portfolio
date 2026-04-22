@@ -457,6 +457,7 @@
     }
 
     backBtn.addEventListener('click', resetZoom);
+    container.addEventListener('glob:reset', resetZoom);
 
     /* ── Interaction ── */
     var mouse = new THREE.Vector2(-9, -9);

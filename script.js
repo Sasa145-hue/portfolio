@@ -462,9 +462,13 @@ function initModeToggle() {
       /* 2. Tout switcher derrière le rideau */
       document.body.classList.toggle('mode-perso');
 
-      document.querySelectorAll(outSels).forEach(el => { el.style.display = 'none'; });
+      document.querySelectorAll(outSels).forEach(el => {
+        if (el.classList.contains('globe-section')) { el.style.display = ''; }
+        else { el.style.display = 'none'; }
+      });
       document.querySelectorAll(inSels).forEach(el  => {
-        el.style.display = 'block';
+        if (el.classList.contains('globe-section')) { el.style.display = ''; }
+        else { el.style.display = 'block'; }
         /* Re-déclencher le wipe diagonal si pas encore visible */
         if (el.classList.contains('section-alt') && !el.classList.contains('diag-visible')) {
           requestAnimationFrame(() => el.classList.add('diag-visible'));
@@ -479,6 +483,10 @@ function initModeToggle() {
       optPerso.classList.toggle('is-active',  goingPerso);
 
       if (window.__resetTags) window.__resetTags();
+      ['globe-pro', 'globe-perso'].forEach(id => {
+        var gc = document.getElementById(id);
+        if (gc) gc.dispatchEvent(new CustomEvent('glob:reset'));
+      });
 
       document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
         if (el.getBoundingClientRect().top < window.innerHeight * 0.92)
