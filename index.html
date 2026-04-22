@@ -119,6 +119,21 @@
 
 
   <!-- ═══════════════════════════════════
+       GLOBE 3D INTERACTIF
+  ═══════════════════════════════════ -->
+  <section id="globe-section" class="globe-section" aria-label="Globe de compétences interactif">
+    <p class="globe-invite" aria-hidden="true">Survolez pour découvrir mon univers</p>
+    <canvas id="globe-canvas" aria-hidden="true"></canvas>
+    <div id="globe-tooltip" class="globe-tooltip" role="tooltip"></div>
+    <div id="globe-panel" class="globe-panel" hidden>
+      <button id="globe-panel-close" class="globe-panel-close" aria-label="Fermer">×</button>
+      <h3 id="globe-panel-title" class="globe-panel-title"></h3>
+      <ul id="globe-panel-list" class="globe-panel-list"></ul>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════
        PRO — PARCOURS
   ═══════════════════════════════════ -->
   <section id="parcours" class="section pro-section">
@@ -598,5 +613,7 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
+  <script src="globe.js"></script>
 </body>
 </html>
