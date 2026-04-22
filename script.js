@@ -170,9 +170,11 @@ function initReveal() {
 
   /* Stagger delay for grid children */
   const staggerMap = [
+    { selector: '.formation-card', base: 0, step: 80 },
     { selector: '.exp-card',       base: 0, step: 90 },
     { selector: '.skill-category', base: 0, step: 70 },
-    { selector: '.metric-item',    base: 0, step: 70 },
+    { selector: '.projet-card',    base: 0, step: 80 },
+    { selector: '.loisir-item',    base: 0, step: 60 },
   ];
 
   staggerMap.forEach(({ selector, base, step }) => {
