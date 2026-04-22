@@ -3,45 +3,33 @@
 /* ══════════════════════════════════════════════════════════════
    LOADER
 ══════════════════════════════════════════════════════════════ */
-(function() {
+(function () {
   const loader = document.getElementById('loader');
   const bar    = document.getElementById('loader-bar');
-  const pct    = document.getElementById('loader-percent');
-
+  const pct    = document.getElementById('loader-pct');
   document.body.classList.add('is-loading');
 
-  let progress = 0;
-
-  function step() {
-    const inc = progress < 70
-      ? Math.random() * 14 + 5
-      : progress < 92
-        ? Math.random() * 4 + 1
-        : Math.random() * 1.2 + 0.3;
-
-    progress = Math.min(progress + inc, 100);
-    bar.style.width  = progress + '%';
-    pct.textContent  = Math.round(progress) + '%';
-
-    if (progress < 100) {
-      setTimeout(step, 55 + Math.random() * 65);
-    } else {
-      setTimeout(finishLoader, 320);
-    }
+  let p = 0;
+  function tick() {
+    p += p < 70 ? Math.random() * 13 + 4 : p < 92 ? Math.random() * 3.5 + 1 : Math.random() * 1 + .3;
+    p  = Math.min(p, 100);
+    bar.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+    if (p < 100) setTimeout(tick, 55 + Math.random() * 60);
+    else setTimeout(done, 320);
   }
 
-  function finishLoader() {
+  function done() {
     loader.classList.add('is-done');
     document.body.classList.remove('is-loading');
     initAll();
   }
-
-  setTimeout(step, 100);
+  setTimeout(tick, 100);
 })();
 
 
 /* ══════════════════════════════════════════════════════════════
-   INIT GLOBAL
+   INIT
 ══════════════════════════════════════════════════════════════ */
 function initAll() {
   setYear();
@@ -56,123 +44,111 @@ function initAll() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER YEAR
+   ANNÉE FOOTER
 ══════════════════════════════════════════════════════════════ */
 function setYear() {
-  const el = document.getElementById('year');
+  const el = document.getElementById('yr');
   if (el) el.textContent = new Date().getFullYear();
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   CURSEUR CARTOON CUSTOM
+   CURSEUR CARTOON — ring avec lag, dot plus rapide
 ══════════════════════════════════════════════════════════════ */
 function initCursor() {
   const cursor = document.getElementById('cursor');
   if (!cursor) return;
 
-  /* Sur mobile/tactile, on cache le curseur custom */
+  /* Masquer sur tactile */
   if (window.matchMedia('(pointer: coarse)').matches) {
     cursor.style.display = 'none';
-    document.body.style.cursor = 'auto';
-    document.querySelectorAll('*').forEach(el => el.style.cursor = '');
     return;
   }
 
   const ring = cursor.querySelector('.cursor-ring');
   const dot  = cursor.querySelector('.cursor-dot');
 
-  let mx = -100, my = -100; // position cible souris
-  let rx = -100, ry = -100; // position réelle du ring (lag)
-  let dx = -100, dy = -100; // position réelle du dot (plus rapide)
+  let mx = -200, my = -200;
+  let rx = -200, ry = -200; /* position ring (lag) */
+  let dx = -200, dy = -200; /* position dot (rapide) */
 
-  /* Lag du ring : 0.1 = plus lent/cartoon, dot : 0.25 */
-  const RING_EASE = 0.1;
-  const DOT_EASE  = 0.3;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX;
-    my = e.clientY;
-  });
+  (function loop() {
+    /* Dot suit rapidement, ring lag en arrière = effet cartoon */
+    dx += (mx - dx) * 0.28;
+    dy += (my - dy) * 0.28;
+    rx += (mx - rx) * 0.1;
+    ry += (my - ry) * 0.1;
 
-  function loop() {
-    rx += (mx - rx) * RING_EASE;
-    ry += (my - ry) * RING_EASE;
-    dx += (mx - dx) * DOT_EASE;
-    dy += (my - dy) * DOT_EASE;
-
-    cursor.style.transform = `translate(${dx}px, ${dy}px)`;
-    ring.style.transform   = `translate(${rx - dx}px, ${ry - dy}px) translate(-50%, -50%)`;
-    dot.style.transform    = `translate(-50%, -50%)`;
+    /* Dot : position exacte de la souris */
+    dot.style.transform  = `translate(${dx}px, ${dy}px) translate(-50%,-50%)`;
+    /* Ring : position retardée */
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
 
     requestAnimationFrame(loop);
-  }
-  loop();
+  })();
 
   /* Hover sur interactifs */
-  document.addEventListener('mouseover', (e) => {
-    if (e.target.closest('a, button, input, textarea, [role="button"]')) {
-      document.body.classList.add('cursor-hover');
-    }
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('a,button,input,textarea,[role=button]'))
+      document.body.classList.add('cur-hover');
   });
-  document.addEventListener('mouseout', (e) => {
-    if (e.target.closest('a, button, input, textarea, [role="button"]')) {
-      document.body.classList.remove('cursor-hover');
-    }
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('a,button,input,textarea,[role=button]'))
+      document.body.classList.remove('cur-hover');
   });
 
-  /* Click press */
-  document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-  document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
-
-  /* Masquer quand la souris quitte la fenêtre */
+  document.addEventListener('mousedown', () => document.body.classList.add('cur-click'));
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cur-click'));
   document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
   document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   HERO — LIGNES TITRE
+   HERO — ANIMATION DES LIGNES (clip-path wipe)
 ══════════════════════════════════════════════════════════════ */
 function initHeroLines() {
   document.querySelectorAll('.hero-name .line').forEach(line => {
     const delay = parseInt(line.dataset.delay || '0', 10);
     setTimeout(() => line.classList.add('is-visible'), delay);
   });
+
+  /* Reveal bio + CTA */
+  setTimeout(() => {
+    document.querySelectorAll('.reveal-h').forEach(el => el.classList.add('is-visible'));
+  }, 700);
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   HERO — ROTATION DE TAGS
+   HERO — ROTATION DES TAGS
 ══════════════════════════════════════════════════════════════ */
 function initTagRotation() {
-  function rotateSet(container) {
-    const tags = container ? container.querySelectorAll('.tag') : [];
+  function rotate(containerSelector) {
+    const tags = document.querySelectorAll(containerSelector + ' .tag');
     if (tags.length < 2) return null;
-    let current = 0;
+    let i = 0;
     return setInterval(() => {
-      tags[current].classList.remove('active');
-      current = (current + 1) % tags.length;
-      tags[current].classList.add('active');
-    }, 2600);
+      tags[i].classList.remove('active');
+      i = (i + 1) % tags.length;
+      tags[i].classList.add('active');
+    }, 2500);
   }
 
-  let timerPro   = rotateSet(document.querySelector('.hero-tags-pro'));
-  let timerPerso = rotateSet(document.querySelector('.hero-tags-perso'));
+  let t1 = rotate('.tags-pro');
+  let t2 = rotate('.tags-perso');
 
-  /* Reset les timers quand le mode change */
-  document.getElementById('mode-btn').addEventListener('click', () => {
-    clearInterval(timerPro);
-    clearInterval(timerPerso);
-
-    /* Reset active states */
+  /* Reset au switch de mode */
+  window.__resetTags = () => {
+    clearInterval(t1); clearInterval(t2);
     document.querySelectorAll('.hero-tags .tag').forEach((t, i) => {
       t.classList.toggle('active', i === 0);
     });
-
-    timerPro   = rotateSet(document.querySelector('.hero-tags-pro'));
-    timerPerso = rotateSet(document.querySelector('.hero-tags-perso'));
-  });
+    t1 = rotate('.tags-pro');
+    t2 = rotate('.tags-perso');
+  };
 }
 
 
@@ -180,46 +156,37 @@ function initTagRotation() {
    HERO — PARALLAX SOURIS
 ══════════════════════════════════════════════════════════════ */
 function initParallax() {
-  const hero   = document.querySelector('.hero');
+  const hero = document.querySelector('.hero');
   if (!hero) return;
 
-  /* Éléments avec data-depth */
-  const parallaxEls = hero.querySelectorAll('[data-depth]');
-
-  let cx = window.innerWidth  / 2;
+  const els = hero.querySelectorAll('[data-depth]');
+  let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
 
-  /* Recalcule le centre si resize */
   window.addEventListener('resize', () => {
-    cx = window.innerWidth  / 2;
+    cx = window.innerWidth / 2;
     cy = window.innerHeight / 2;
   }, { passive: true });
 
   let ticking = false;
-
-  hero.addEventListener('mousemove', (e) => {
+  hero.addEventListener('mousemove', e => {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      const dx = (e.clientX - cx) / cx; // -1 → 1
-      const dy = (e.clientY - cy) / cy; // -1 → 1
-
-      parallaxEls.forEach(el => {
-        const depth = parseFloat(el.dataset.depth);
-        const tx = dx * depth * 40;
-        const ty = dy * depth * 28;
-        el.style.transform = `translate(${tx}px, ${ty}px)`;
+      const dx = (e.clientX - cx) / cx;
+      const dy = (e.clientY - cy) / cy;
+      els.forEach(el => {
+        const d  = parseFloat(el.dataset.depth);
+        el.style.transform = `translate(${dx * d * 42}px, ${dy * d * 30}px)`;
       });
-
       ticking = false;
     });
   });
 
-  /* Retour doux au centre quand la souris quitte le hero */
   hero.addEventListener('mouseleave', () => {
-    parallaxEls.forEach(el => {
+    els.forEach(el => {
       el.style.transition = 'transform 1.2s ease';
-      el.style.transform  = 'translate(0, 0)';
+      el.style.transform  = 'translate(0,0)';
       setTimeout(() => { el.style.transition = ''; }, 1200);
     });
   });
@@ -235,24 +202,23 @@ function initReveal() {
     return;
   }
 
-  /* Stagger sur les grilles */
+  /* Stagger */
   [
-    { sel: '.tl-item',       step: 80  },
-    { sel: '.skill-cat',     step: 70  },
-    { sel: '.passion-card',  step: 80  },
-    { sel: '.projet-card',   step: 90  },
-    { sel: '.contact-card',  step: 60  },
-  ].forEach(({ sel, step }) => {
-    document.querySelectorAll(sel).forEach((el, i) => {
+    { s: '.tl',          step: 90  },
+    { s: '.tool-cat',    step: 80  },
+    { s: '.passion-card',step: 80  },
+    { s: '.cc',          step: 60  },
+  ].forEach(({ s, step }) => {
+    document.querySelectorAll(s).forEach((el, i) => {
       el.style.transitionDelay = (i * step) + 'ms';
     });
   });
 
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-visible');
+        obs.unobserve(e.target);
       }
     });
   }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
@@ -262,65 +228,114 @@ function initReveal() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   BOUTON MODE PRO / PERSO
+   MODE TOGGLE — PRO / MOI avec animation de switch
 ══════════════════════════════════════════════════════════════ */
 function initModeToggle() {
-  const btn = document.getElementById('mode-btn');
+  const btn       = document.getElementById('mode-btn');
+  const optPro    = document.getElementById('opt-pro');
+  const optPerso  = document.getElementById('opt-perso');
+  const photo     = document.getElementById('hero-img');
   if (!btn) return;
 
-  btn.addEventListener('click', () => {
-    const isPerso = document.body.classList.toggle('mode-perso');
+  /* État initial : PRO actif */
+  optPro.classList.add('is-active');
 
-    /* Re-trigger les reveals dans le nouveau contenu visible */
+  btn.addEventListener('click', () => {
+    const goingPerso = !document.body.classList.contains('mode-perso');
+
+    /* 1. Blur sur la photo */
+    if (photo) {
+      photo.style.transition = 'filter .35s ease, opacity .35s ease';
+      photo.style.filter     = 'blur(14px)';
+      photo.style.opacity    = '0.25';
+    }
+
+    /* 2. Fade out les sections actuelles */
+    const outSels = goingPerso ? '.pro-section'   : '.perso-section';
+    const inSels  = goingPerso ? '.perso-section' : '.pro-section';
+
+    document.querySelectorAll(outSels).forEach(el => {
+      el.style.transition = 'opacity .28s ease';
+      el.style.opacity    = '0';
+    });
+
     setTimeout(() => {
-      document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.92) {
-          el.classList.add('is-visible');
-        }
+      /* 3. Switche le mode */
+      document.body.classList.toggle('mode-perso');
+
+      /* 4. Masque les anciennes, montre les nouvelles */
+      document.querySelectorAll(outSels).forEach(el => {
+        el.style.display = 'none';
+        el.style.opacity = '';
+        el.style.transition = '';
       });
-    }, 50);
+      document.querySelectorAll(inSels).forEach(el => {
+        el.style.display  = 'block';
+        el.style.opacity  = '0';
+        el.style.transition = 'opacity .4s ease';
+        requestAnimationFrame(() => { el.style.opacity = '1'; });
+      });
+
+      /* 5. Update bouton */
+      optPro.classList.toggle('is-active',    !goingPerso);
+      optPerso.classList.toggle('is-active',   goingPerso);
+
+      /* 6. Déblur photo */
+      setTimeout(() => {
+        if (photo) {
+          photo.style.filter  = 'blur(0)';
+          photo.style.opacity = '1';
+          setTimeout(() => {
+            photo.style.transition = '';
+            photo.style.filter     = '';
+            photo.style.opacity    = '';
+          }, 400);
+        }
+
+        /* 7. Reset tags */
+        if (window.__resetTags) window.__resetTags();
+
+        /* 8. Re-trigger reveals dans les nouvelles sections */
+        document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight * 0.92) el.classList.add('is-visible');
+        });
+      }, 200);
+
+    }, 280);
   });
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   FORMULAIRE DE CONTACT
+   FORMULAIRE CONTACT
 ══════════════════════════════════════════════════════════════ */
 function initContactForm() {
   const form = document.getElementById('contact-form');
   if (!form) return;
+  const btn = form.querySelector('.btn-send');
 
-  const btn = form.querySelector('.btn-submit');
-
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', e => {
     e.preventDefault();
-
-    const name    = form.querySelector('#name').value.trim();
-    const email   = form.querySelector('#email').value.trim();
-    const message = form.querySelector('#message').value.trim();
-
-    if (!name || !email || !message) return;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      form.querySelector('#email').focus();
-      return;
+    const name = form.querySelector('#f-name').value.trim();
+    const mail = form.querySelector('#f-email').value.trim();
+    const msg  = form.querySelector('#f-msg').value.trim();
+    if (!name || !mail || !msg) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+      form.querySelector('#f-email').focus(); return;
     }
 
     btn.classList.add('is-sent');
-    btn.disabled = true;
+    btn.disabled        = true;
     btn.style.background = '#4ade80';
+    btn.style.color      = '#fff';
 
     setTimeout(() => {
       btn.classList.remove('is-sent');
       btn.disabled         = false;
       btn.style.background = '';
+      btn.style.color      = '';
       form.reset();
     }, 3500);
-
-    /*
-      Connecter ici votre service d'envoi :
-      fetch('/api/contact', { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ name, email, message }) })
-    */
   });
 }
