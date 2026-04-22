@@ -57,8 +57,20 @@
           { name: 'Looker Studio',    level: 72, desc: 'Rapports et tableaux de bord connectés aux sources de données.',               url: 'https://lookerstudio.google.com' },
         ]
       },
+      /* index 5 — Parcours (phi 1.0 rad ≈ 57°, theta 4.2 rad ≈ 241°) */
+      { label: 'Parcours', phi: 57, theta: 241,
+        subs: [
+          { name: 'Bachelor INSEEC', desc: 'Marketing Digital, Data & IA — Bordeaux 2024-2025',                  url: '#' },
+          { name: 'BTS NDRC',        desc: 'Négociation Digitalisation Relation Client — Bordeaux 2022-2024',   url: '#' },
+          { name: 'Bac Général',     desc: 'SES & LLCE — Bordeaux 2021-2022',                                   url: '#' },
+          { name: 'Atelier CUB',     desc: 'Alternance NDRC — Mérignac 2022-2024',                              url: '#' },
+          { name: 'Evasion Gym',     desc: 'Marketing Digital & Création Web — Eysines 2022-2025',              url: '#' },
+          { name: 'Ericsson',        desc: "Stage Télécom — Côte d'Ivoire 2017",                                url: '#' },
+        ]
+      },
     ],
-    mainEdges: [[0,1],[0,2],[1,2],[0,3],[1,4],[3,4],[2,4]],
+    /* [5,0] Parcours↔Marketing Digital  [5,1] Parcours↔Data&IA  [5,2] Parcours↔CRM */
+    mainEdges: [[0,1],[0,2],[1,2],[0,3],[1,4],[3,4],[2,4],[5,0],[5,1],[5,2]],
   };
 
   var DATA_PASSION = {
@@ -123,11 +135,7 @@
         '<button class="gmodal-close" aria-label="Fermer">×</button>' +
         '<h4 class="gmodal-title"></h4>' +
         '<p class="gmodal-desc"></p>' +
-        '<div class="gmodal-bar-track"><div class="gmodal-bar-fill"></div></div>' +
-        '<div class="gmodal-meta">' +
-          '<span class="gmodal-level"></span>' +
-          '<a class="gmodal-link" target="_blank" rel="noopener">En savoir plus →</a>' +
-        '</div>' +
+        '<a class="gmodal-link" target="_blank" rel="noopener">En savoir plus →</a>' +
       '</div>';
     document.body.appendChild(el);
     el.querySelector('.gmodal-close').addEventListener('click', function () {
@@ -142,14 +150,9 @@
 
   function openSubModal(sub, accentHex) {
     var ov   = getModal();
-    var fill = ov.querySelector('.gmodal-bar-fill');
     var link = ov.querySelector('.gmodal-link');
     ov.querySelector('.gmodal-title').textContent = sub.name;
     ov.querySelector('.gmodal-desc').textContent  = sub.desc;
-    ov.querySelector('.gmodal-level').textContent = sub.level + ' %';
-    fill.style.transition = 'none';
-    fill.style.width      = '0%';
-    fill.style.background = accentHex;
     if (sub.url && sub.url !== '#') {
       link.href = sub.url;
       link.style.cssText = 'display:inline;color:' + accentHex;
@@ -157,12 +160,6 @@
       link.style.display = 'none';
     }
     ov.classList.add('is-open');
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        fill.style.transition = 'width .65s cubic-bezier(.16,1,.3,1)';
-        fill.style.width = sub.level + '%';
-      });
-    });
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -185,8 +182,6 @@
   function initGlobe(containerId, data) {
     var container = document.getElementById(containerId);
     if (!container) return;
-    var canvas = container.querySelector('.globe-canvas');
-    if (!canvas) return;
 
     var R       = 1.85;
     var C_MAIN  = data.color;
@@ -229,13 +224,19 @@
     /* ── Renderer ── */
     var renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     } catch (_) { return; }
 
-    var W = container.clientWidth  || 800;
-    var H = container.clientHeight || 620;
+    var W = container.offsetWidth  || 800;
+    var H = container.offsetHeight || 620;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(W, H, false);
+    renderer.setSize(W, H);
+
+    /* Vide le placeholder et monte le vrai canvas Three.js */
+    container.querySelectorAll('.globe-canvas').forEach(function (el) { el.remove(); });
+    var canvas = renderer.domElement;
+    canvas.className = 'globe-canvas';
+    container.appendChild(canvas);
 
     var scene  = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
@@ -355,6 +356,7 @@
         m.scale.setScalar(1);
       });
       edgeMats.forEach(function (e) {
+        e.mat.color.set(C_MAIN);
         e.mat.opacity = e.isMain ? 0.32 : 0.20;
       });
       globe.children.forEach(function (c) {
@@ -363,38 +365,79 @@
     }
 
     function highlightNode(id) {
-      var connected = new Set();
-      EDGES.forEach(function (pair) {
-        if (pair[0] === id) connected.add(pair[1]);
-        if (pair[1] === id) connected.add(pair[0]);
-      });
-      NODES.forEach(function (nd) {
-        var m = meshes[nd.id]; if (!m) return;
-        if (nd.id === id) {
+      var nd  = NODES[id];
+      /* Nœuds qui restent visibles (le nœud + ses connexions directes) */
+      var vis = new Set([id]);
+      if (nd.type === 'main') {
+        /* Nœud principal : montrer uniquement ses sous-nœuds directs */
+        NODES.forEach(function (n) {
+          if (n.type === 'sub' && n.mainIdx === nd.mainIdx) vis.add(n.id);
+        });
+      } else {
+        /* Sous-nœud : montrer uniquement son parent */
+        vis.add(mainIds[nd.mainIdx]);
+      }
+
+      NODES.forEach(function (n) {
+        var m = meshes[n.id]; if (!m) return;
+        if (n.id === id) {
           m.material.color.set(C_MAIN);
           m.material.opacity = 1;
           m.scale.setScalar(1.85);
-        } else if (connected.has(nd.id)) {
-          m.material.opacity = 0.88;
-          m.scale.setScalar(1.08);
+        } else if (vis.has(n.id)) {
+          m.material.color.set(n.type === 'main' ? C_MAIN : 0xffffff);
+          m.material.opacity = 0.85;
+          m.scale.setScalar(1);
         } else {
-          m.material.opacity = 0.10;
+          m.material.opacity = 0.08;
+          m.scale.setScalar(1);
         }
       });
       edgeMats.forEach(function (e) {
-        e.mat.opacity = (e.a === id || e.b === id) ? 0.90 : 0.04;
+        var lit = (e.a === id || e.b === id) && vis.has(e.a) && vis.has(e.b);
+        e.mat.color.set(lit ? 0xF59E0B : C_MAIN);
+        e.mat.opacity = lit ? 0.90 : 0.03;
       });
       globe.children.forEach(function (c) {
-        if (c.userData.isGlow) {
-          c.material.opacity = c.userData.nodeId === id ? 0.48 : 0.04;
+        if (c.userData.isGlow)
+          c.material.opacity = c.userData.nodeId === id ? 0.48 : 0.03;
+      });
+    }
+
+    /* ── Zoom — focus exclusif ── */
+    function applyZoomHL(mainId) {
+      var mainNd = NODES[mainId];
+      NODES.forEach(function (nd) {
+        var m = meshes[nd.id]; if (!m) return;
+        if (nd.id === mainId) {
+          m.material.color.set(C_MAIN);
+          m.material.opacity = 1;
+          m.scale.setScalar(2.5);
+        } else if (nd.type === 'sub' && nd.mainIdx === mainNd.mainIdx) {
+          m.material.color.set(0xffffff);
+          m.material.opacity = 0.90;
+          m.scale.setScalar(1);
+        } else {
+          m.material.opacity = 0;
+          m.scale.setScalar(1);
         }
+      });
+      edgeMats.forEach(function (e) {
+        var isDirect =
+          (e.a === mainId && NODES[e.b].type === 'sub' && NODES[e.b].mainIdx === mainNd.mainIdx) ||
+          (e.b === mainId && NODES[e.a].type === 'sub' && NODES[e.a].mainIdx === mainNd.mainIdx);
+        e.mat.color.set(isDirect ? 0xF59E0B : C_MAIN);
+        e.mat.opacity = isDirect ? 1.0 : 0;
+      });
+      globe.children.forEach(function (c) {
+        if (c.userData.isGlow)
+          c.material.opacity = c.userData.nodeId === mainId ? 0.50 : 0;
       });
     }
 
     /* ── Interaction ── */
     var mouse = new THREE.Vector2(-9, -9);
     var ray   = new THREE.Raycaster();
-    /* Augmenter le seuil de raycasting pour faciliter le hover */
     ray.params.Line = { threshold: 0.1 };
     var interMeshes = NODES.map(function (nd) { return meshes[nd.id]; }).filter(Boolean);
 
@@ -404,33 +447,87 @@
     var tX = 0, tY = 0, tgX = 0, tgY = 0;
     var lastCX = 0, lastCY = 0;
 
+    /* ── Zoom état ── */
+    var BASE_Z       = 5.5;
+    var camTarget    = new THREE.Vector3(0, 0, BASE_Z);
+    var zoomedMainId = -1;
+    var zoomMeshes   = [];
+
+    /* Bouton ← Retour */
+    var backBtn = document.createElement('button');
+    backBtn.className = 'globe-back-btn';
+    backBtn.textContent = '← Retour';
+    backBtn.style.display = 'none';
+    container.appendChild(backBtn);
+
+    function zoomToNode(nd) {
+      var worldPos = new THREE.Vector3();
+      meshes[nd.id].getWorldPosition(worldPos);
+      camTarget.copy(worldPos.clone().normalize().multiplyScalar(4.0));
+      zoomedMainId = nd.id;
+      zoomMeshes = NODES
+        .filter(function (n) { return n.id === nd.id || (n.type === 'sub' && n.mainIdx === nd.mainIdx); })
+        .map(function (n) { return meshes[n.id]; })
+        .filter(Boolean);
+      applyZoomHL(nd.id);
+      tgX = 0; tgY = 0;
+      autoRot = !reduced;
+      backBtn.style.display = '';
+      fadeInvite();
+    }
+
+    function resetZoom() {
+      camTarget.set(0, 0, BASE_Z);
+      zoomedMainId = -1;
+      zoomMeshes   = [];
+      backBtn.style.display = 'none';
+      resetHL();
+      autoRot = !reduced;
+    }
+
+    backBtn.addEventListener('click', resetZoom);
+    container.addEventListener('glob:reset', resetZoom);
+
     canvas.addEventListener('mousemove', function (e) {
       lastCX = e.clientX;
       lastCY = e.clientY;
       var r = canvas.getBoundingClientRect();
       mouse.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
       mouse.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
-      var cx = r.left + r.width  / 2;
-      var cy = r.top  + r.height / 2;
-      tgY = ((e.clientX - cx) / (r.width  / 2)) * 0.18;
-      tgX = ((e.clientY - cy) / (r.height / 2)) * 0.10;
+      /* Tilt uniquement hors zoom */
+      if (zoomedMainId < 0) {
+        var cx = r.left + r.width  / 2;
+        var cy = r.top  + r.height / 2;
+        tgY = ((e.clientX - cx) / (r.width  / 2)) * 0.18;
+        tgX = ((e.clientY - cy) / (r.height / 2)) * 0.10;
+      }
     }, { passive: true });
 
     canvas.addEventListener('mouseleave', function () {
       mouse.set(-9, -9);
       hideTip();
-      if (hovId >= 0) { resetHL(); hovId = -1; }
-      tgX = 0; tgY = 0;
-      autoRot = !reduced;
+      if (hovId >= 0) {
+        hovId = -1;
+        if (zoomedMainId >= 0) applyZoomHL(zoomedMainId);
+        else { resetHL(); autoRot = !reduced; }
+      }
+      if (zoomedMainId < 0) { tgX = 0; tgY = 0; autoRot = !reduced; }
       canvas.style.cursor = '';
     }, { passive: true });
 
     canvas.addEventListener('click', function () {
-      if (hovId < 0) return;
       fadeInvite();
-      var nd = NODES[hovId];
-      if (nd.type === 'main') openPanel(nd);
-      else                    openSubModal(nd.subData, C_HEX);
+      if (hovId >= 0) {
+        var nd = NODES[hovId];
+        if (nd.type === 'main') {
+          if (zoomedMainId === nd.id) resetZoom();
+          else zoomToNode(nd);
+        } else {
+          openSubModal(nd.subData, C_HEX);
+        }
+      } else if (zoomedMainId >= 0) {
+        resetZoom();
+      }
     });
 
     /* Drag tactile pour faire pivoter */
@@ -451,37 +548,40 @@
     /* ── Boucle de rendu ── */
     function tick() {
       requestAnimationFrame(tick);
-      /* Sauter les frames quand la section est cachée */
-      if (container.clientWidth === 0) return;
+      if (container.offsetWidth === 0) return;
 
       if (!reduced) {
-        if (autoRot) rotY += 0.00068;
+        if (autoRot) rotY += (zoomedMainId >= 0 ? 0.00034 : 0.00068);
         tX += (tgX - tX) * 0.05;
         tY += (tgY - tY) * 0.05;
         globe.rotation.y = rotY;
         globe.rotation.x = tX;
       }
 
+      /* Zoom caméra (lerp vers la cible) */
+      camera.position.lerp(camTarget, 0.055);
+      camera.lookAt(0, 0, 0);
+
+      var castMeshes = (zoomedMainId >= 0) ? zoomMeshes : interMeshes;
       ray.setFromCamera(mouse, camera);
-      var hits = ray.intersectObjects(interMeshes, false);
+      var hits = ray.intersectObjects(castMeshes, false);
 
       if (hits.length) {
         var id = hits[0].object.userData.nodeId;
         if (id !== hovId) {
-          resetHL();
+          if (zoomedMainId < 0) { resetHL(); autoRot = false; }
           highlightNode(id);
           hovId = id;
-          autoRot = false;
         }
         canvas.style.cursor = 'pointer';
         showTip(NODES[id].label, lastCX, lastCY);
       } else {
         if (hovId >= 0) {
-          resetHL();
           hovId = -1;
-          autoRot = !reduced;
           hideTip();
           canvas.style.cursor = '';
+          if (zoomedMainId >= 0) applyZoomHL(zoomedMainId);
+          else { resetHL(); autoRot = !reduced; }
         }
       }
 
@@ -491,20 +591,20 @@
     /* ── Redimensionnement ── */
     if (typeof ResizeObserver !== 'undefined') {
       var ro = new ResizeObserver(function () {
-        var nW = container.clientWidth;
-        var nH = container.clientHeight;
+        var nW = container.offsetWidth;
+        var nH = container.offsetHeight;
         if (nW === 0 || nH === 0) return;
-        renderer.setSize(nW, nH, false);
+        renderer.setSize(nW, nH);
         camera.aspect = nW / nH;
         camera.updateProjectionMatrix();
       });
       ro.observe(container);
     } else {
       window.addEventListener('resize', function () {
-        var nW = container.clientWidth;
-        var nH = container.clientHeight;
+        var nW = container.offsetWidth;
+        var nH = container.offsetHeight;
         if (nW === 0 || nH === 0) return;
-        renderer.setSize(nW, nH, false);
+        renderer.setSize(nW, nH);
         camera.aspect = nW / nH;
         camera.updateProjectionMatrix();
       }, { passive: true });
@@ -514,9 +614,11 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     INITIALISATION
+     INITIALISATION — appelée par initAll() après le loader
   ═══════════════════════════════════════════════════════════ */
-  initGlobe('globe-pro',   DATA_PRO);
-  initGlobe('globe-perso', DATA_PASSION);
+  window.__initGlobes = function () {
+    initGlobe('globe-pro',   DATA_PRO);
+    initGlobe('globe-perso', DATA_PASSION);
+  };
 
 })();

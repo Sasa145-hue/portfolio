@@ -7,8 +7,14 @@
   <meta name="description" content="Salif Lacan — Bachelor Marketing Digital, Data & IA, Bordeaux.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3">
+  <!-- GSAP 3 — animations éditoriales -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+  <!-- jsPDF — CV téléchargeable côté client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -48,10 +54,20 @@
   ═══════════════════════════════════ -->
   <header id="site-header">
     <a href="#hero" class="header-logo">SALIF LACAN</a>
-    <button id="mode-btn" aria-label="Changer de mode">
-      <span class="mode-opt" id="opt-pro">PRO</span>
-      <span class="mode-opt" id="opt-perso">PASSION</span>
-    </button>
+    <div class="header-actions">
+      <button class="btn-cv" id="btn-download-cv" aria-label="Télécharger mon CV en PDF">
+        <span>CV</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </button>
+      <button id="mode-btn" aria-label="Changer de mode">
+        <span class="mode-opt" id="opt-pro">PRO</span>
+        <span class="mode-opt" id="opt-perso">PASSION</span>
+      </button>
+    </div>
   </header>
 
   <!-- ═══════════════════════════════════
@@ -131,6 +147,65 @@
       <ul class="globe-panel-list"></ul>
     </div>
   </section>
+
+  <!-- ═══════════════════════════════════
+       PRO — OUTILS MAÎTRISÉS
+  ═══════════════════════════════════ -->
+  <section id="outils" class="section section-alt pro-section diag-visible">
+    <div class="s-head">
+      <span class="s-num">—</span>
+      <h2 class="s-title reveal">Outils maîtrisés</h2>
+    </div>
+    <div class="skills-grid">
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Data &amp; Analyse</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Google Analytics</span>
+          <span class="skill-tag">Power BI</span>
+          <span class="skill-tag">Excel / Google Sheets</span>
+          <span class="skill-tag">Reporting</span>
+          <span class="skill-tag">Analyse données</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Marketing Digital</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Meta Ads</span>
+          <span class="skill-tag">SEO</span>
+          <span class="skill-tag">Email Marketing</span>
+          <span class="skill-tag">Community Management</span>
+          <span class="skill-tag">Stratégie digitale</span>
+          <span class="skill-tag">Digitalisation commerciale</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Outils &amp; Plateformes</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Microsoft 365</span>
+          <span class="skill-tag">Google Workspace</span>
+          <span class="skill-tag">Figma</span>
+          <span class="skill-tag">Notion</span>
+          <span class="skill-tag">CMS / WordPress</span>
+          <span class="skill-tag">Canva</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal">
+        <h3 class="skill-cat-title">Relation Client &amp; Vente</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">CRM</span>
+          <span class="skill-tag">Vente multicanal</span>
+          <span class="skill-tag">Prospection digitale</span>
+          <span class="skill-tag">Communication multicanal</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 
   <!-- ═══════════════════════════════════
        GLOBE 3D — PASSION
@@ -231,7 +306,7 @@
   <!-- ═══════════════════════════════════
        PRO — LOGICIELS (cliquables)
   ═══════════════════════════════════ -->
-  <section id="logiciels" class="section section-alt pro-section">
+  <section id="logiciels" class="section section-alt pro-section diag-visible">
     <div class="s-head">
       <span class="s-num">02</span>
       <h2 class="s-title reveal">Outils &amp; Logiciels</h2>
@@ -598,7 +673,15 @@
           <span class="cc-val cc-small">Véhiculé &mdash; Permis B</span>
         </div>
       </div>
-      <form id="contact-form" class="contact-form reveal" novalidate>
+      <!-- Formspree (ID: mqewgqpo) — valider l'email sur formspree.io lors du premier envoi -->
+      <form id="contact-form" class="contact-form reveal"
+            action="https://formspree.io/f/mqewgqpo"
+            method="POST"
+            novalidate>
+        <!-- Honeypot anti-spam -->
+        <input type="text" name="_gotcha" style="display:none" aria-hidden="true">
+        <input type="hidden" name="_next" value="https://sasa145-hue.github.io/portfolio/?sent=true">
+        <input type="hidden" name="_subject" value="Nouveau message depuis ton portfolio">
         <div class="f-row">
           <div class="f-group">
             <label for="f-name">Nom</label>
@@ -626,8 +709,69 @@
     <span>Marketing Digital &amp; Data &mdash; Bordeaux</span>
   </footer>
 
+  <!-- ═══════════════════════════════════
+       PANNEAU OUTIL — iframe overlay
+  ═══════════════════════════════════ -->
+  <div class="tool-panel" id="tool-panel" aria-hidden="true">
+
+    <div class="tool-panel-bar">
+      <div class="browser-dots">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </div>
+      <div class="browser-url">
+        <span class="url-lock">🔒</span>
+        <span class="url-display" id="url-display">analytics.google.com</span>
+      </div>
+      <button class="panel-close" id="panel-close" aria-label="Fermer">✕</button>
+    </div>
+
+    <div class="tool-panel-header">
+      <span class="tool-panel-name" id="tool-panel-name">Google Analytics</span>
+      <span class="tool-panel-cat"  id="tool-panel-cat">Data &amp; Analyse</span>
+    </div>
+
+    <div class="tool-frame-wrap" id="tool-frame-wrap">
+
+      <iframe
+        id="tool-iframe"
+        class="tool-iframe"
+        src=""
+        title="Aperçu outil"
+        loading="lazy"
+        allow="autoplay; fullscreen; xr-spatial-tracking"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+
+      <div class="iframe-overlay" id="iframe-overlay">
+        <div class="iframe-overlay-inner">
+          <div class="iframe-overlay-rings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+          </div>
+          <p>Cliquez pour activer le défilement et l'interaction</p>
+        </div>
+      </div>
+
+      <div class="tool-iframe-fallback" id="tool-iframe-fallback">
+        <div class="fallback-content">
+          <p class="fallback-name" id="fallback-name">Google Analytics</p>
+          <p class="fallback-blocked">Ce site ne peut pas être affiché en iframe.</p>
+          <a class="fallback-open" id="fallback-open" href="#" target="_blank" rel="noopener noreferrer">
+            Ouvrir le site officiel →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tool-panel-backdrop" id="tool-panel-backdrop"></div>
+
   <script src="script.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
+  <script src="assets/three.min.js"></script>
   <script src="globe.js"></script>
 </body>
 </html>
