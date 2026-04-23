@@ -972,7 +972,7 @@ function generateCV() {
   doc.setFontSize(8.5);
   doc.setTextColor(...gris);
   doc.text('saliflacan00@gmail.com', 20, 49);
-  doc.text('07 88 68 64 21  ·  06 40 56 13 37', 85, 49);
+  doc.text('07 88 68 64 21  , 85, 49);
   doc.text('Bordeaux, 33000  ·  Véhiculé · Permis B', 148, 49);
 
   // ── Formation ──
