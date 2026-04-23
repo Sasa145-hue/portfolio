@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Bebas+Neue&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
   <!-- GSAP 3 — animations éditoriales -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -656,67 +656,72 @@
   </footer>
 
   <!-- ═══════════════════════════════════
-       PANNEAU OUTIL — iframe overlay
+       MODAL OUTIL IMMERSIVE
   ═══════════════════════════════════ -->
-  <div class="tool-panel" id="tool-panel" aria-hidden="true">
+  <div class="tool-modal" id="tool-modal" aria-hidden="true">
 
-    <div class="tool-panel-bar">
-      <div class="browser-dots">
-        <span class="dot dot-red"></span>
-        <span class="dot dot-yellow"></span>
-        <span class="dot dot-green"></span>
+    <canvas class="tool-modal-stars" id="tool-modal-stars"></canvas>
+
+    <div class="tool-modal-inner">
+
+      <div class="tool-modal-topbar">
+        <span class="tool-modal-name-top" id="tool-modal-name-top">Google Analytics</span>
+        <div class="modal-dots">
+          <span class="mdot" style="background:#8B5CF6"></span>
+          <span class="mdot" style="background:#F59E0B"></span>
+          <span class="mdot" style="background:#4ade80"></span>
+        </div>
       </div>
-      <div class="browser-url">
-        <span class="url-lock">🔒</span>
-        <span class="url-display" id="url-display">analytics.google.com</span>
-      </div>
-      <button class="panel-close" id="panel-close" aria-label="Fermer">✕</button>
-    </div>
 
-    <div class="tool-panel-header">
-      <span class="tool-panel-name" id="tool-panel-name">Google Analytics</span>
-      <span class="tool-panel-cat"  id="tool-panel-cat">Data &amp; Analyse</span>
-    </div>
+      <div class="tool-modal-frame" id="tool-modal-frame">
 
-    <div class="tool-frame-wrap" id="tool-frame-wrap">
+        <iframe
+          id="tool-modal-iframe"
+          class="tool-modal-iframe"
+          src=""
+          title="Aperçu outil"
+          loading="lazy"
+          allow="autoplay; fullscreen; xr-spatial-tracking; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation"
+        ></iframe>
 
-      <iframe
-        id="tool-iframe"
-        class="tool-iframe"
-        src=""
-        title="Aperçu outil"
-        loading="lazy"
-        allow="autoplay; fullscreen; xr-spatial-tracking"
-        referrerpolicy="strict-origin-when-cross-origin"
-      ></iframe>
-
-      <div class="iframe-overlay" id="iframe-overlay">
-        <div class="iframe-overlay-inner">
-          <div class="iframe-overlay-rings">
-            <div class="ring ring-1"></div>
-            <div class="ring ring-2"></div>
-            <div class="ring ring-3"></div>
+        <div class="tool-activation-overlay" id="tool-activation-overlay">
+          <div class="tool-activation-rings">
+            <div class="tar tar-1"></div>
+            <div class="tar tar-2"></div>
+            <div class="tar tar-3"></div>
+            <div class="tar-dot"></div>
           </div>
           <p>Cliquez pour activer le défilement et l'interaction</p>
         </div>
+
+        <div class="tool-hard-fallback" id="tool-hard-fallback">
+          <div class="thf-inner">
+            <p class="thf-name" id="thf-name">Google Analytics</p>
+            <p class="thf-msg">Ce site refuse d'être intégré.</p>
+            <a class="thf-btn" id="thf-btn" href="#" target="_blank" rel="noopener">
+              Ouvrir en plein écran →
+            </a>
+          </div>
+        </div>
+
       </div>
 
-      <div class="tool-iframe-fallback" id="tool-iframe-fallback">
-        <div class="fallback-content">
-          <p class="fallback-name" id="fallback-name">Google Analytics</p>
-          <p class="fallback-short" id="fallback-short"></p>
-          <p class="fallback-long"  id="fallback-long"></p>
-          <p class="fallback-blocked">Ce site ne peut pas être affiché directement.</p>
-          <a class="fallback-open" id="fallback-open" href="#" target="_blank" rel="noopener noreferrer">
-            Ouvrir le site officiel →
-          </a>
-        </div>
+      <div class="tool-modal-footer">
+        <a class="tool-live-btn" id="tool-live-btn" href="#" target="_blank" rel="noopener">
+          <span class="live-dot"></span>
+          Ouvrir le site officiel
+        </a>
+        <button class="tool-modal-close-btn" id="tool-modal-close">
+          Fermer ✕
+        </button>
       </div>
 
     </div>
   </div>
 
-  <div class="tool-panel-backdrop" id="tool-panel-backdrop"></div>
+  <div class="tool-modal-backdrop" id="tool-modal-backdrop"></div>
 
   <script src="script.js"></script>
   <script src="assets/three.min.js"></script>

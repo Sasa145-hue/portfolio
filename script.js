@@ -92,7 +92,7 @@ function initAll() {
   initAproposOrb();
   initScrollCircle();
   initModeToggle();
-  initToolPanel();
+  initToolModal();
   initContactForm();
   initDownloadCV();
   if (window.__initGlobes) window.__initGlobes();
@@ -701,48 +701,189 @@ function initModeToggle() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   MODAL OUTIL
+   MODAL OUTIL IMMERSIVE — étoiles + iframe + fallback
 ══════════════════════════════════════════════════════════════ */
+function initModalStars() {
+  const canvas = document.getElementById('tool-modal-stars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    o: Math.random() * 0.6 + 0.1,
+    speed: Math.random() * 0.3 + 0.05
+  }));
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.o += s.speed * 0.02;
+      if (s.o > 0.7) s.speed = -Math.abs(s.speed);
+      if (s.o < 0.1) s.speed =  Math.abs(s.speed);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${s.o})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+}
+
+const toolsDB = {
+  'Google Analytics':      { url: 'https://marketingplatform.google.com/about/analytics/', cat: 'Data & Analyse' },
+  'Power BI':              { url: 'https://powerbi.microsoft.com/fr-fr/',                  cat: 'Data & Analyse' },
+  'Excel / Google Sheets': { url: 'https://workspace.google.com/products/sheets/',        cat: 'Data & Analyse' },
+  'Looker Studio':         { url: 'https://lookerstudio.google.com',                       cat: 'Data & Analyse' },
+  'Meta Ads':              { url: 'https://www.facebook.com/business/ads',                 cat: 'Marketing Digital' },
+  'SEO':                   { url: 'https://search.google.com/search-console/about',        cat: 'Marketing Digital' },
+  'Email Marketing':       { url: 'https://mailchimp.com',                                 cat: 'Marketing Digital' },
+  'Community Management':  { url: 'https://buffer.com',                                    cat: 'Marketing Digital' },
+  'Microsoft 365':         { url: 'https://www.microsoft.com/fr-fr/microsoft-365',        cat: 'Outils' },
+  'Figma':                 { url: 'https://figma.com',                                     cat: 'Outils' },
+  'Notion':                { url: 'https://notion.so',                                     cat: 'Outils' },
+  'WordPress':             { url: 'https://wordpress.org',                                 cat: 'Outils' },
+  'Canva':                 { url: 'https://canva.com',                                     cat: 'Outils' },
+  'Google Workspace':      { url: 'https://workspace.google.com',                          cat: 'Outils' },
+  'CRM':                   { url: 'https://hubspot.com',                                   cat: 'CRM & Vente' },
+  'Hubspot':               { url: 'https://hubspot.com',                                   cat: 'CRM & Vente' },
+};
+
+function getProxiedUrl(originalUrl) {
+  const blockedDomains = [
+    'google.com', 'microsoft.com', 'facebook.com',
+    'notion.so', 'figma.com', 'hubspot.com',
+    'mailchimp.com', 'buffer.com', 'canva.com',
+    'wordpress.org', 'linkedin.com', 'twitter.com'
+  ];
+  const isBlocked = blockedDomains.some(d => originalUrl.includes(d));
+  if (isBlocked) {
+    return `https://api.allorigins.win/raw?url=${encodeURIComponent(originalUrl)}`;
+  }
+  return originalUrl;
+}
+
 function initToolModal() {
-  const modal      = document.getElementById('tool-modal');
-  const modalBg    = document.getElementById('modal-bg');
-  const modalClose = document.getElementById('modal-close');
-  const modalLogo  = document.getElementById('modal-logo');
-  const modalName  = document.getElementById('modal-name');
-  const modalShort = document.getElementById('modal-short');
-  const modalLong  = document.getElementById('modal-long');
-  const modalUrl   = document.getElementById('modal-url');
+  const modal        = document.getElementById('tool-modal');
+  const backdrop     = document.getElementById('tool-modal-backdrop');
+  const iframe       = document.getElementById('tool-modal-iframe');
+  const nameTop      = document.getElementById('tool-modal-name-top');
+  const activation   = document.getElementById('tool-activation-overlay');
+  const fallback     = document.getElementById('tool-hard-fallback');
+  const fallbackBtn  = document.getElementById('thf-btn');
+  const fallbackName = document.getElementById('thf-name');
+  const liveBtn      = document.getElementById('tool-live-btn');
+  const closeBtn     = document.getElementById('tool-modal-close');
   if (!modal) return;
 
-  function openModal(btn) {
-    const logo = btn.dataset.logo || '';
-    const url  = btn.dataset.url  || '';
-    modalLogo.src           = logo;
-    modalLogo.style.display = logo ? '' : 'none';
-    modalName.textContent   = btn.dataset.name  || '';
-    modalShort.innerHTML    = btn.dataset.short || '';
-    modalLong.innerHTML     = btn.dataset.long  || '';
-    if (url) { modalUrl.href = url; modalUrl.hidden = false; }
-    else      { modalUrl.hidden = true; }
-    modal.hidden              = false;
+  initModalStars();
+
+  function openModal(toolName) {
+    const data = toolsDB[toolName];
+    if (!data) return;
+
+    activation.classList.remove('is-activated');
+    fallback.classList.remove('is-visible');
+    iframe.src = '';
+
+    nameTop.textContent      = toolName;
+    fallbackName.textContent = toolName;
+    fallbackBtn.href         = data.url;
+    liveBtn.href             = data.url;
+
+    let fallbackTimer = setTimeout(() => showFallback(toolName, data.url), 6000);
+
+    iframe.src = getProxiedUrl(data.url);
+
+    iframe.onload = () => {
+      clearTimeout(fallbackTimer);
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || !doc.body || doc.body.innerHTML.length < 50) showFallback(toolName, data.url);
+      } catch (_) {
+        /* cross-origin = site chargé normalement */
+      }
+    };
+
+    iframe.onerror = () => { clearTimeout(fallbackTimer); showFallback(toolName, data.url); };
+
+    modal.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    modalClose.focus();
+  }
+
+  function showFallback(name, url) {
+    fallbackName.textContent = name;
+    fallbackBtn.href = url;
+    fallback.classList.add('is-visible');
+    activation.classList.add('is-activated');
   }
 
   function closeModal() {
-    modal.hidden = true;
+    modal.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    setTimeout(() => {
+      iframe.src = '';
+      activation.classList.remove('is-activated');
+      fallback.classList.remove('is-visible');
+    }, 600);
   }
 
-  document.querySelectorAll('.tool-item').forEach(btn => {
-    btn.addEventListener('click', () => openModal(btn));
+  activation.addEventListener('click', () => {
+    activation.classList.add('is-activated');
+    iframe.focus();
   });
 
-  modalClose.addEventListener('click', closeModal);
-  modalBg.addEventListener('click', closeModal);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !modal.hidden) closeModal();
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* Connecter les tool-items (#logiciels) */
+  document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.name || '';
+      if (toolsDB[name]) {
+        openModal(name);
+      } else {
+        /* fallback : utiliser l'url du dataset directement */
+        const url = btn.dataset.url || '#';
+        openModal._direct(btn.dataset.name || '', url);
+      }
+    });
   });
+
+  /* Ouverture directe par nom (depuis .tool-item avec url personnalisée) */
+  openModal._direct = function(name, url) {
+    activation.classList.remove('is-activated');
+    fallback.classList.remove('is-visible');
+    iframe.src = '';
+    nameTop.textContent      = name;
+    fallbackName.textContent = name;
+    fallbackBtn.href         = url;
+    liveBtn.href             = url;
+    let t = setTimeout(() => showFallback(name, url), 6000);
+    iframe.src = url;
+    iframe.onload = () => { clearTimeout(t); };
+    iframe.onerror = () => { clearTimeout(t); showFallback(name, url); };
+    modal.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.openToolModal = openModal;
 }
 
 
@@ -970,135 +1111,3 @@ function generateCV() {
 }
 
 
-/* ══════════════════════════════════════════════════════════════
-   PANNEAU OUTIL — iframe + overlay d'activation (pattern Mango Media)
-══════════════════════════════════════════════════════════════ */
-const toolsDatabase = {
-  /* Data & Analyse */
-  'Google Analytics':      { url: 'https://marketingplatform.google.com/about/analytics/', cat: 'Data & Analyse' },
-  'Power BI':              { url: 'https://powerbi.microsoft.com/fr-fr/', cat: 'Data & Analyse' },
-  'Excel / Google Sheets': { url: 'https://workspace.google.com/products/sheets/', cat: 'Data & Analyse' },
-  'Reporting':             { url: 'https://lookerstudio.google.com', cat: 'Data & Analyse' },
-  'Analyse données':       { url: 'https://datastudio.google.com', cat: 'Data & Analyse' },
-  /* Marketing Digital */
-  'Meta Ads':                   { url: 'https://www.facebook.com/business/ads', cat: 'Marketing Digital' },
-  'SEO':                        { url: 'https://search.google.com/search-console/about', cat: 'Marketing Digital' },
-  'Email Marketing':            { url: 'https://mailchimp.com', cat: 'Marketing Digital' },
-  'Community Management':       { url: 'https://buffer.com', cat: 'Marketing Digital' },
-  'Stratégie digitale':         { url: 'https://semrush.com', cat: 'Marketing Digital' },
-  'Digitalisation commerciale': { url: 'https://salesforce.com', cat: 'Marketing Digital' },
-  /* Outils & Plateformes */
-  'Microsoft 365':    { url: 'https://www.microsoft.com/fr-fr/microsoft-365', cat: 'Outils & Plateformes' },
-  'Google Workspace': { url: 'https://workspace.google.com', cat: 'Outils & Plateformes' },
-  'Figma':            { url: 'https://figma.com', cat: 'Outils & Plateformes' },
-  'Notion':           { url: 'https://notion.so', cat: 'Outils & Plateformes' },
-  'CMS / WordPress':  { url: 'https://wordpress.org', cat: 'Outils & Plateformes' },
-  'Canva':            { url: 'https://canva.com', cat: 'Outils & Plateformes' },
-  /* Relation Client & Vente */
-  'CRM':                    { url: 'https://hubspot.com', cat: 'Relation Client & Vente' },
-  'Vente multicanal':       { url: 'https://pipedrive.com', cat: 'Relation Client & Vente' },
-  'Prospection digitale':   { url: 'https://linkedin.com/sales', cat: 'Relation Client & Vente' },
-  'Communication multicanal':{ url: 'https://hootsuite.com', cat: 'Relation Client & Vente' },
-};
-
-function initToolPanel() {
-  const panel          = document.getElementById('tool-panel');
-  const backdrop       = document.getElementById('tool-panel-backdrop');
-  const closeBtn       = document.getElementById('panel-close');
-  const iframe         = document.getElementById('tool-iframe');
-  const urlDisplay     = document.getElementById('url-display');
-  const nameEl         = document.getElementById('tool-panel-name');
-  const catEl          = document.getElementById('tool-panel-cat');
-  const iframeOverlay  = document.getElementById('iframe-overlay');
-  const fallback       = document.getElementById('tool-iframe-fallback');
-  const fallbackOpen   = document.getElementById('fallback-open');
-  const fallbackName   = document.getElementById('fallback-name');
-  const fallbackShort  = document.getElementById('fallback-short');
-  const fallbackLong   = document.getElementById('fallback-long');
-  if (!panel) return;
-
-  let fallbackTimer = null;
-
-  /* openPanel({ name, url, cat, short, long }) */
-  function openPanel({ name, url, cat, short = '', long = '' }) {
-    /* Reset */
-    clearTimeout(fallbackTimer);
-    iframeOverlay.classList.remove('is-activated');
-    fallback.classList.remove('is-visible');
-    iframe.src = '';
-
-    /* Remplir le panneau */
-    nameEl.textContent        = name;
-    catEl.textContent         = cat;
-    fallbackName.textContent  = name;
-    fallbackOpen.href         = url;
-    fallbackShort.textContent = short;
-    fallbackLong.textContent  = long;
-    urlDisplay.textContent    = url.replace(/^https?:\/\//, '').split('/')[0];
-
-    /* Charger l'iframe */
-    iframe.src = url;
-
-    /* Fallback si l'iframe ne se charge pas en 5 s */
-    fallbackTimer = setTimeout(() => {
-      fallback.classList.add('is-visible');
-    }, 5000);
-
-    iframe.onload = () => {
-      clearTimeout(fallbackTimer);
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body) throw new Error('blocked');
-      } catch (_) {
-        fallback.classList.add('is-visible');
-        iframeOverlay.classList.add('is-activated');
-      }
-    };
-
-    panel.classList.add('is-open');
-    panel.setAttribute('aria-hidden', 'false');
-    backdrop.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-    closeBtn.focus();
-  }
-
-  function closePanel() {
-    panel.classList.remove('is-open');
-    panel.setAttribute('aria-hidden', 'true');
-    backdrop.classList.remove('is-open');
-    document.body.style.overflow = '';
-    clearTimeout(fallbackTimer);
-
-    /* Vider l'iframe après la transition */
-    setTimeout(() => {
-      iframe.src = '';
-      iframeOverlay.classList.remove('is-activated');
-      fallback.classList.remove('is-visible');
-    }, 750);
-  }
-
-  /* Overlay → activer l'iframe */
-  iframeOverlay.addEventListener('click', () => {
-    iframeOverlay.classList.add('is-activated');
-    iframe.focus();
-  });
-
-  /* Tool items (#logiciels) */
-  document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      openPanel({
-        name:  btn.dataset.name  || '',
-        url:   btn.dataset.url   || '#',
-        cat:   btn.closest('.tool-cat')?.querySelector('.tool-cat-title')?.textContent || 'Outil',
-        short: btn.dataset.short || '',
-        long:  btn.dataset.long  || '',
-      });
-    });
-  });
-
-  closeBtn.addEventListener('click', closePanel);
-  backdrop.addEventListener('click', closePanel);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
-  });
-}
