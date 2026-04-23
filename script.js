@@ -761,25 +761,67 @@ const toolsDB = {
 
 
 function initToolModal() {
-  const modal    = document.getElementById('tool-modal');
-  const backdrop = document.getElementById('tool-modal-backdrop');
-  const nameTop  = document.getElementById('tool-modal-name-top');
-  const thfName  = document.getElementById('thf-name');
-  const thfCat   = document.getElementById('thf-cat');
-  const thfBtn   = document.getElementById('thf-btn');
-  const closeBtn = document.getElementById('tool-modal-close');
+  const modal      = document.getElementById('tool-modal');
+  const backdrop   = document.getElementById('tool-modal-backdrop');
+  const iframe     = document.getElementById('tool-modal-iframe');
+  const nameTop    = document.getElementById('tool-modal-name-top');
+  const activation = document.getElementById('tool-activation-overlay');
+  const fallback   = document.getElementById('tool-hard-fallback');
+  const thfName    = document.getElementById('thf-name');
+  const thfCat     = document.getElementById('thf-cat');
+  const thfBtn     = document.getElementById('thf-btn');
+  const liveBtn    = document.getElementById('tool-live-btn');
+  const closeBtn   = document.getElementById('tool-modal-close');
   if (!modal) return;
 
   initModalStars();
+
+  let fallbackTimer = null;
+
+  function showFallback(name, url) {
+    thfName.textContent = name;
+    thfBtn.href         = url;
+    fallback.classList.add('is-visible');
+    activation.classList.add('is-activated');
+  }
 
   function openModal(toolName) {
     const data = toolsDB[toolName];
     if (!data) return;
 
+    /* reset */
+    clearTimeout(fallbackTimer);
+    activation.classList.remove('is-activated');
+    fallback.classList.remove('is-visible');
+    iframe.src = '';
+
+    /* remplir */
     nameTop.textContent = toolName;
     thfName.textContent = toolName;
     thfCat.textContent  = data.cat;
     thfBtn.href         = data.url;
+    if (liveBtn) liveBtn.href = data.url;
+
+    /* charger l'iframe */
+    iframe.src = data.url;
+
+    /* fallback automatique après 5 s si l'iframe ne répond pas */
+    fallbackTimer = setTimeout(() => showFallback(toolName, data.url), 5000);
+
+    iframe.onload = () => {
+      clearTimeout(fallbackTimer);
+      try {
+        /* si on peut lire contentDocument → même origine, iframe OK */
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || !doc.body || doc.body.innerHTML.length < 100) {
+          showFallback(toolName, data.url);
+        }
+      } catch (_) {
+        /* cross-origin sans X-Frame-Options → iframe chargée normalement */
+      }
+    };
+
+    iframe.onerror = () => { clearTimeout(fallbackTimer); showFallback(toolName, data.url); };
 
     modal.classList.add('is-open');
     backdrop.classList.add('is-open');
@@ -793,7 +835,19 @@ function initToolModal() {
     backdrop.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    clearTimeout(fallbackTimer);
+    setTimeout(() => {
+      iframe.src = '';
+      activation.classList.remove('is-activated');
+      fallback.classList.remove('is-visible');
+    }, 600);
   }
+
+  /* clic sur l'overlay → activer l'iframe */
+  activation.addEventListener('click', () => {
+    activation.classList.add('is-activated');
+    iframe.focus();
+  });
 
   /* tool-items (#logiciels) */
   document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
@@ -802,12 +856,20 @@ function initToolModal() {
       if (toolsDB[name]) {
         openModal(name);
       } else {
-        /* outil hors DB : ouvrir directement */
         const url = btn.dataset.url || '#';
+        clearTimeout(fallbackTimer);
+        activation.classList.remove('is-activated');
+        fallback.classList.remove('is-visible');
+        iframe.src = '';
         nameTop.textContent = name;
         thfName.textContent = name;
         thfCat.textContent  = btn.closest('.tool-cat')?.querySelector('.tool-cat-title')?.textContent || '';
-        thfBtn.href         = url;
+        thfBtn.href = url;
+        if (liveBtn) liveBtn.href = url;
+        iframe.src = url;
+        fallbackTimer = setTimeout(() => showFallback(name, url), 5000);
+        iframe.onload  = () => clearTimeout(fallbackTimer);
+        iframe.onerror = () => { clearTimeout(fallbackTimer); showFallback(name, url); };
         modal.classList.add('is-open');
         backdrop.classList.add('is-open');
         modal.setAttribute('aria-hidden', 'false');

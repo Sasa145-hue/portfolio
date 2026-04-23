@@ -1374,48 +1374,58 @@ body.mode-perso .modal-logo-big {
   opacity: 0.85;
 }
 
-/* ── Card centrale (remplace l'iframe) ── */
-.tool-modal-card {
+/* ── Cadre iframe ── */
+.tool-modal-frame {
   width: 100%;
-  border-radius: 20px;
+  height: clamp(320px, 58vh, 680px);
+  border-radius: 16px;
+  overflow: hidden;
   border: 1px solid rgba(139, 92, 246, 0.2);
-  background: rgba(8, 6, 18, 0.7);
-  backdrop-filter: blur(16px);
+  position: relative;
+  background: #050510;
   box-shadow:
-    0 0 80px rgba(139, 92, 246, 0.1),
-    0 40px 120px rgba(0, 0, 0, 0.55),
+    0 0 80px rgba(139, 92, 246, 0.08),
+    0 40px 120px rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px rgba(255,255,255,0.04);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  padding: 4rem 2rem;
-  text-align: center;
+}
+
+.tool-modal-iframe {
+  width: 100%; height: 100%;
+  border: none; display: block;
+  position: relative; z-index: 1;
+}
+
+/* ── Overlay activation (rings pulsants) ── */
+.tool-activation-overlay {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2rem; cursor: pointer;
+  transition: opacity 0.4s ease, visibility 0.4s;
+}
+.tool-activation-overlay.is-activated {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+.tool-activation-overlay p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.7); text-align: center;
+  background: rgba(30,30,40,0.7); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.65rem 1.5rem; border-radius: 100px;
 }
 
 .tool-activation-rings {
-  position: relative;
-  width: 80px; height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  position: relative; width: 80px; height: 80px;
+  display: flex; align-items: center; justify-content: center;
 }
-.tar {
-  position: absolute;
-  border-radius: 50%;
-  animation: tarPulse 2.5s ease-out infinite;
-}
+.tar { position: absolute; border-radius: 50%; animation: tarPulse 2.5s ease-out infinite; }
 .tar-1 { width: 50px; height: 50px; border: 1.5px solid #F59E0B; animation-delay: 0s; }
 .tar-2 { width: 50px; height: 50px; border: 1.5px solid #8B5CF6; animation-delay: 0.85s; }
 .tar-3 { width: 50px; height: 50px; border: 1.5px solid rgba(139,92,246,0.4); animation-delay: 1.7s; }
 .tar-dot {
-  width: 10px; height: 10px;
-  background: #F59E0B;
-  border-radius: 50%;
-  position: absolute;
-  z-index: 2;
+  width: 10px; height: 10px; background: #F59E0B; border-radius: 50%;
+  position: absolute; z-index: 2;
   box-shadow: 0 0 20px rgba(245,158,11,0.8), 0 0 40px rgba(245,158,11,0.3);
   animation: tarDotPulse 2.5s ease-in-out infinite;
 }
@@ -1429,62 +1439,72 @@ body.mode-perso .modal-logo-big {
   50%       { transform: scale(1.3); box-shadow: 0 0 30px rgba(245,158,11,1); }
 }
 
+/* ── Fallback si iframe bloquée ── */
+.tool-hard-fallback {
+  position: absolute; inset: 0; z-index: 5;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(6,4,16,0.97);
+}
+.tool-hard-fallback.is-visible { display: flex; }
+
+.thf-inner {
+  text-align: center; display: flex;
+  flex-direction: column; align-items: center; gap: 1rem;
+}
 .thf-name {
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(2.5rem, 6vw, 4.5rem);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.08em; line-height: 1;
   background: linear-gradient(135deg, #8B5CF6, #F59E0B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .thf-cat {
-  font-size: 0.68rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: rgba(255,255,255,0.3);
-  margin-top: -1rem;
+}
+.thf-msg {
+  font-size: 0.78rem; color: rgba(255,255,255,0.25); letter-spacing: 0.04em;
 }
 .thf-btn {
-  display: inline-block;
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  background: #F59E0B;
-  color: #0a0a0a;
-  font-weight: 700;
-  padding: 0.85rem 2.25rem;
-  border-radius: 100px;
+  display: inline-block; font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase; background: #F59E0B; color: #0a0a0a;
+  font-weight: 700; padding: 0.85rem 2.25rem; border-radius: 100px;
   transition: background 0.25s, transform 0.2s;
 }
 .thf-btn:hover { background: #D97706; transform: translateY(-2px); }
 
+/* ── Footer ── */
 .tool-modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; gap: 1.5rem;
+}
+.tool-live-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.85);
+  background: rgba(20,20,30,0.8); border: 1px solid rgba(255,255,255,0.12);
+  padding: 0.55rem 1.25rem; border-radius: 100px;
+  backdrop-filter: blur(8px); transition: border-color 0.25s, color 0.25s;
+}
+.tool-live-btn:hover { border-color: #8B5CF6; color: #fff; }
+.live-dot {
+  width: 8px; height: 8px; background: #4ade80; border-radius: 50%; flex-shrink: 0;
+  animation: livePulse 1.8s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(74,222,128,0.6);
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
 }
 .tool-modal-close-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.4);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  padding: 0.55rem 1.5rem;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: all 0.25s;
+  background: transparent; border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem; letter-spacing: 0.12em;
+  padding: 0.55rem 1.25rem; border-radius: 100px; cursor: pointer; transition: all 0.25s;
 }
-.tool-modal-close-btn:hover {
-  border-color: rgba(139,92,246,0.5);
-  color: rgba(255,255,255,0.8);
-}
+.tool-modal-close-btn:hover { border-color: rgba(139,92,246,0.5); color: rgba(255,255,255,0.8); }
 
 @media (max-width: 768px) {
   .tool-modal-inner { width: 95vw; }
-  .tool-modal-card { padding: 3rem 1.5rem; }
+  .tool-modal-frame { height: max(240px, 55vw); }
   .tool-modal-name-top { font-size: 1rem; }
 }
 
