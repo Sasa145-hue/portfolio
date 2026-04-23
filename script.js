@@ -758,31 +758,16 @@ const toolsDB = {
   'Hubspot':               { url: 'https://hubspot.com',                                   cat: 'CRM & Vente' },
 };
 
-function getProxiedUrl(originalUrl) {
-  const blockedDomains = [
-    'google.com', 'microsoft.com', 'facebook.com',
-    'notion.so', 'figma.com', 'hubspot.com',
-    'mailchimp.com', 'buffer.com', 'canva.com',
-    'wordpress.org', 'linkedin.com', 'twitter.com'
-  ];
-  const isBlocked = blockedDomains.some(d => originalUrl.includes(d));
-  if (isBlocked) {
-    return `https://api.allorigins.win/raw?url=${encodeURIComponent(originalUrl)}`;
-  }
-  return originalUrl;
-}
+
 
 function initToolModal() {
-  const modal        = document.getElementById('tool-modal');
-  const backdrop     = document.getElementById('tool-modal-backdrop');
-  const iframe       = document.getElementById('tool-modal-iframe');
-  const nameTop      = document.getElementById('tool-modal-name-top');
-  const activation   = document.getElementById('tool-activation-overlay');
-  const fallback     = document.getElementById('tool-hard-fallback');
-  const fallbackBtn  = document.getElementById('thf-btn');
-  const fallbackName = document.getElementById('thf-name');
-  const liveBtn      = document.getElementById('tool-live-btn');
-  const closeBtn     = document.getElementById('tool-modal-close');
+  const modal    = document.getElementById('tool-modal');
+  const backdrop = document.getElementById('tool-modal-backdrop');
+  const nameTop  = document.getElementById('tool-modal-name-top');
+  const thfName  = document.getElementById('thf-name');
+  const thfCat   = document.getElementById('thf-cat');
+  const thfBtn   = document.getElementById('thf-btn');
+  const closeBtn = document.getElementById('tool-modal-close');
   if (!modal) return;
 
   initModalStars();
@@ -791,42 +776,16 @@ function initToolModal() {
     const data = toolsDB[toolName];
     if (!data) return;
 
-    activation.classList.remove('is-activated');
-    fallback.classList.remove('is-visible');
-    iframe.src = '';
-
-    nameTop.textContent      = toolName;
-    fallbackName.textContent = toolName;
-    fallbackBtn.href         = data.url;
-    liveBtn.href             = data.url;
-
-    let fallbackTimer = setTimeout(() => showFallback(toolName, data.url), 6000);
-
-    iframe.src = getProxiedUrl(data.url);
-
-    iframe.onload = () => {
-      clearTimeout(fallbackTimer);
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body || doc.body.innerHTML.length < 50) showFallback(toolName, data.url);
-      } catch (_) {
-        /* cross-origin = site chargé normalement */
-      }
-    };
-
-    iframe.onerror = () => { clearTimeout(fallbackTimer); showFallback(toolName, data.url); };
+    nameTop.textContent = toolName;
+    thfName.textContent = toolName;
+    thfCat.textContent  = data.cat;
+    thfBtn.href         = data.url;
 
     modal.classList.add('is-open');
     backdrop.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-  }
-
-  function showFallback(name, url) {
-    fallbackName.textContent = name;
-    fallbackBtn.href = url;
-    fallback.classList.add('is-visible');
-    activation.classList.add('is-activated');
+    closeBtn.focus();
   }
 
   function closeModal() {
@@ -834,54 +793,33 @@ function initToolModal() {
     backdrop.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    setTimeout(() => {
-      iframe.src = '';
-      activation.classList.remove('is-activated');
-      fallback.classList.remove('is-visible');
-    }, 600);
   }
 
-  activation.addEventListener('click', () => {
-    activation.classList.add('is-activated');
-    iframe.focus();
-  });
-
-  closeBtn.addEventListener('click', closeModal);
-  backdrop.addEventListener('click', closeModal);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  /* Connecter les tool-items (#logiciels) */
+  /* tool-items (#logiciels) */
   document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const name = btn.dataset.name || '';
       if (toolsDB[name]) {
         openModal(name);
       } else {
-        /* fallback : utiliser l'url du dataset directement */
+        /* outil hors DB : ouvrir directement */
         const url = btn.dataset.url || '#';
-        openModal._direct(btn.dataset.name || '', url);
+        nameTop.textContent = name;
+        thfName.textContent = name;
+        thfCat.textContent  = btn.closest('.tool-cat')?.querySelector('.tool-cat-title')?.textContent || '';
+        thfBtn.href         = url;
+        modal.classList.add('is-open');
+        backdrop.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
       }
     });
   });
 
-  /* Ouverture directe par nom (depuis .tool-item avec url personnalisée) */
-  openModal._direct = function(name, url) {
-    activation.classList.remove('is-activated');
-    fallback.classList.remove('is-visible');
-    iframe.src = '';
-    nameTop.textContent      = name;
-    fallbackName.textContent = name;
-    fallbackBtn.href         = url;
-    liveBtn.href             = url;
-    let t = setTimeout(() => showFallback(name, url), 6000);
-    iframe.src = url;
-    iframe.onload = () => { clearTimeout(t); };
-    iframe.onerror = () => { clearTimeout(t); showFallback(name, url); };
-    modal.classList.add('is-open');
-    backdrop.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  };
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
   window.openToolModal = openModal;
 }
