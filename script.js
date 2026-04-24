@@ -987,6 +987,7 @@ function generateCV() {
 
   y += 10;
   const formations = [
+    { badge: 'Master', titre: 'Manager en data marketing ',             ecole: 'INSEEC — Bordeaux', date: '2025 — 2027' },
     { badge: 'Bachelor', titre: 'Marketing Digital, Data & IA',             ecole: 'INSEEC — Bordeaux', date: '2024 — 2025' },
     { badge: 'BTS',      titre: 'Négociation Digitalisation Relation Client', ecole: 'Bordeaux',          date: '2022 — 2024' },
     { badge: 'Bac',      titre: 'Baccalauréat Général — SES & LLCE',         ecole: 'Bordeaux',          date: '2021 — 2022' },
@@ -1015,6 +1016,19 @@ function generateCV() {
 
   y += 10;
   const exps = [
+    {
+      role: 'Marketing Digital SEO & management data',
+      company: 'Exosens — Mérignac',
+      date: '2025 — 2027  ·  Alternance',
+      missions: [
+        `Suivi et analyse de toutes les demandes d'informations, devis et soumissions effectuées sur le site internet d'Exosens.`,
+        `Aide et accompagnement de ma supérieure sur les différentes tâches liées à la gestion et à l'évolution du site internet`,
+        `Rédaction et mise en ligne d'articles, de pages et de tout autre contenu sur le site internet d'Exosens.`,
+        `Mise en place de visuels de données permettant à chaque business unit d'avoir accès à ses propres performances digitales de manière claire et ciblée.`,
+        `Accompagnement des équipes sur la prise en main de nouveaux outils et sensibilisation aux bonnes pratiques en matière de collecte et d'exploitation des données.`,
+        `Contribution à l'amélioration du référencement du site à travers le SEO et le GEO, avec création de supports de présentation pour sensibiliser les équipes à ces enjeux.`,
+      ],
+    },
     {
       role: 'NDRC — Négociation Digitalisation Relation Client',
       company: 'Atelier CUB — Mérignac',
