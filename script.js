@@ -1024,9 +1024,9 @@ function generateCV() {
         `Suivi et analyse de toutes les demandes d'informations, devis et soumissions effectuées sur le site internet d'Exosens.`,
         `Aide et accompagnement de ma supérieure sur les différentes tâches liées à la gestion et à l'évolution du site internet`,
         `Rédaction et mise en ligne d'articles, de pages et de tout autre contenu sur le site internet d'Exosens.`,
-        `Mise en place de visuels de données permettant à chaque business unit d'avoir accès à ses propres performances digitales de manière claire et ciblée.`,
-        `Accompagnement des équipes sur la prise en main de nouveaux outils et sensibilisation aux bonnes pratiques en matière de collecte et d'exploitation des données.`,
-        `Contribution à l'amélioration du référencement du site à travers le SEO et le GEO, avec création de supports de présentation pour sensibiliser les équipes à ces enjeux.`,
+        `Mise en place de visuels de données permettant à chaque business unit.`,
+        `Accompagnement des équipes sur la prise en main de nouveaux outils.`,
+        `Contribution à l'amélioration du référencement du site à travers le SEO et le GEO.`,
       ],
     },
     {
