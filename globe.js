@@ -523,7 +523,8 @@
           if (zoomedMainId === nd.id) resetZoom();
           else zoomToNode(nd);
         } else {
-          openSubModal(nd.subData, C_HEX);
+          if (window.openToolModal && nd.label) window.openToolModal(nd.label);
+          else openSubModal(nd.subData, C_HEX);
         }
       } else if (zoomedMainId >= 0) {
         resetZoom();
