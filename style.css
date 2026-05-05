@@ -1107,16 +1107,13 @@ textarea { resize: vertical; min-height: 130px; }
 .hero-bio,
 .tl-detail li,
 .passion-text {
-  border-radius: 4px;
-  padding: .12rem .3rem;
-  margin-left: -.3rem;
-  transition: background .2s ease, color .65s ease;
+  transition: color .2s ease;
 }
 .apropos-text p:hover,
 .hero-bio:hover,
 .tl-detail li:hover,
 .passion-text:hover {
-  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 
