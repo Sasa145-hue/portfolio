@@ -92,7 +92,7 @@ function initAll() {
   initAproposOrb();
   initScrollCircle();
   initModeToggle();
-  initToolPanel();
+  initToolModal();
   initContactForm();
   initDownloadCV();
   if (window.__initGlobes) window.__initGlobes();
@@ -144,7 +144,7 @@ function initCursor() {
   });
 
   /* Scale sur éléments interactifs */
-  document.querySelectorAll('a, button, .tool-item, .skill-tag, .tl').forEach(el => {
+  document.querySelectorAll('a, button, .tool-item, .tl').forEach(el => {
     el.addEventListener('mouseenter', () => {
       gsap.to(ring, { scale: 1.8, duration: 0.3, ease: 'power2.out' });
       gsap.to(dot,  { opacity: 0.4, duration: 0.2 });
@@ -520,20 +520,6 @@ function initScrollRevealEditorial() {
     });
   });
 
-  /* Skill tags : explosion de scale depuis le centre */
-  document.querySelectorAll('.skill-tags').forEach(container => {
-    const tags = container.querySelectorAll('.skill-tag');
-    if (!tags.length) return;
-    gsap.from(tags, {
-      scale: 0.65,
-      opacity: 0,
-      duration: 0.45,
-      stagger: 0.04,
-      ease: 'back.out(2)',
-      scrollTrigger: { trigger: container, start: 'top 87%' }
-    });
-  });
-
   /* Dates timeline : glissement depuis la gauche */
   document.querySelectorAll('.tl-date').forEach(el => {
     gsap.from(el, {
@@ -565,7 +551,7 @@ function initMagneticCards() {
   if (window.matchMedia('(pointer: coarse)').matches) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  document.querySelectorAll('.tl, .skill-category, .tool-cat, .passion-card').forEach(card => {
+  document.querySelectorAll('.tl, .tool-cat, .passion-card').forEach(card => {
     card.style.transformStyle = 'preserve-3d';
 
     card.addEventListener('mousemove', e => {
@@ -715,48 +701,187 @@ function initModeToggle() {
 
 
 /* ══════════════════════════════════════════════════════════════
-   MODAL OUTIL
+   OUTILS — données + modal screenshot
 ══════════════════════════════════════════════════════════════ */
+const toolsData = {
+  'CMS & E-commerce': [
+    { name: 'WordPress',  desc: 'Sites vitrines & blogs',         url: 'https://wordpress.org',   screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fwordpress.org?w=1280&h=720' },
+    { name: 'Drupal',     desc: 'Sites institutionnels complexes', url: 'https://drupal.org',      screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fdrupal.org?w=1280&h=720' },
+    { name: 'Wix',        desc: 'Création drag-and-drop',         url: 'https://wix.com',         screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fwix.com?w=1280&h=720' },
+    { name: 'PrestaShop', desc: 'E-commerce open-source',         url: 'https://prestashop.com',  screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fprestashop.com?w=1280&h=720' },
+  ],
+  'Data & Analytics': [
+    { name: 'Google Analytics 4',    desc: 'Suivi & analyse du trafic',          url: 'https://marketingplatform.google.com/about/analytics/', screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fmarketingplatform.google.com%2Fabout%2Fanalytics%2F?w=1280&h=720' },
+    { name: 'Google Search Console', desc: 'SEO & performances Google',           url: 'https://search.google.com/search-console/about',        screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fsearch.google.com%2Fsearch-console%2Fabout?w=1280&h=720' },
+    { name: 'Power BI',              desc: 'Dashboards & reporting',              url: 'https://powerbi.microsoft.com/fr-fr/',                  screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fpowerbi.microsoft.com%2Ffr-fr%2F?w=1280&h=720' },
+    { name: 'Looker Studio',         desc: 'Dashboards Google interconnectés',    url: 'https://lookerstudio.google.com',                       screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Flookerstudio.google.com?w=1280&h=720' },
+    { name: 'Gephi',                 desc: 'Visualisation de réseaux de données', url: 'https://gephi.org',                                     screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fgephi.org?w=1280&h=720' },
+  ],
+  'Marketing & Publicité': [
+    { name: 'Google Ads', desc: 'Search, Display & Shopping',   url: 'https://ads.google.com',               screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fads.google.com?w=1280&h=720' },
+    { name: 'Meta Ads',   desc: 'Facebook & Instagram Ads',     url: 'https://www.facebook.com/business/ads', screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fwww.facebook.com%2Fbusiness%2Fads?w=1280&h=720' },
+    { name: 'HubSpot',    desc: 'CRM & automation',             url: 'https://hubspot.com',                  screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fhubspot.com?w=1280&h=720' },
+    { name: 'Mailchimp',  desc: 'Email marketing & automation', url: 'https://mailchimp.com',                screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fmailchimp.com?w=1280&h=720' },
+  ],
+  'Outils & Bureautique': [
+    { name: 'Figma',            desc: 'Design UI/UX collaboratif',      url: 'https://figma.com',                             screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Ffigma.com?w=1280&h=720' },
+    { name: 'Notion',           desc: 'Organisation & documentation',   url: 'https://notion.so',                             screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fnotion.so?w=1280&h=720' },
+    { name: 'Canva',            desc: 'Création graphique & visuels',   url: 'https://canva.com',                             screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fcanva.com?w=1280&h=720' },
+    { name: 'Microsoft 365',    desc: 'Word, Excel, PowerPoint, Teams', url: 'https://www.microsoft.com/fr-fr/microsoft-365', screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fwww.microsoft.com%2Ffr-fr%2Fmicrosoft-365?w=1280&h=720' },
+    { name: 'Google Workspace', desc: 'Gmail, Drive, Docs, Sheets',     url: 'https://workspace.google.com',                 screenshot: 'https://s0.wordpress.com/mshots/v1/https%3A%2F%2Fworkspace.google.com?w=1280&h=720' },
+  ],
+};
+
+function buildOutilsSection() {
+  const container = document.getElementById('outils-columns');
+  if (!container) return;
+  Object.entries(toolsData).forEach(([category, tools]) => {
+    const col = document.createElement('div');
+    col.className = 'outil-category reveal';
+    const title = document.createElement('h3');
+    title.className = 'outil-category-title';
+    title.textContent = category;
+    col.appendChild(title);
+    tools.forEach(tool => {
+      const row = document.createElement('div');
+      row.className = 'outil-row';
+      row.setAttribute('role', 'button');
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('aria-label', `Explorer ${tool.name}`);
+      row.innerHTML = `<div class="outil-icon">${tool.icon}</div><div class="outil-info"><span class="outil-name">${tool.name}</span><span class="outil-desc">${tool.desc}</span></div><span class="outil-arrow">→</span>`;
+      row.addEventListener('click', () => window.openToolModal && window.openToolModal(tool));
+      row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.openToolModal && window.openToolModal(tool); } });
+      col.appendChild(row);
+    });
+    container.appendChild(col);
+  });
+}
+
+function getScreenshotUrl(url) {
+  return `https://s0.wordpress.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=720`;
+}
+
+function initModalStars() {
+  const canvas = document.getElementById('tool-modal-stars');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    o: Math.random() * 0.6 + 0.1,
+    speed: Math.random() * 0.3 + 0.05
+  }));
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.o += s.speed * 0.02;
+      if (s.o > 0.7) s.speed = -Math.abs(s.speed);
+      if (s.o < 0.1) s.speed =  Math.abs(s.speed);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${s.o})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+}
+
 function initToolModal() {
+  initModalStars();
+
   const modal      = document.getElementById('tool-modal');
-  const modalBg    = document.getElementById('modal-bg');
-  const modalClose = document.getElementById('modal-close');
-  const modalLogo  = document.getElementById('modal-logo');
-  const modalName  = document.getElementById('modal-name');
-  const modalShort = document.getElementById('modal-short');
-  const modalLong  = document.getElementById('modal-long');
-  const modalUrl   = document.getElementById('modal-url');
+  const backdrop   = document.getElementById('tool-modal-backdrop');
+  const nameTop    = document.getElementById('tool-modal-name-top');
+  const screenshot = document.getElementById('tool-screenshot');
+  const loader     = document.getElementById('screenshot-loader');
+  const fallback   = document.getElementById('screenshot-fallback');
+  const sfName     = document.getElementById('sf-name');
+  const sfDesc     = document.getElementById('sf-desc');
+  const liveBtn    = document.getElementById('tool-live-btn');
+  const closeBtn   = document.getElementById('tool-modal-close');
   if (!modal) return;
 
-  function openModal(btn) {
-    const logo = btn.dataset.logo || '';
-    const url  = btn.dataset.url  || '';
-    modalLogo.src           = logo;
-    modalLogo.style.display = logo ? '' : 'none';
-    modalName.textContent   = btn.dataset.name  || '';
-    modalShort.innerHTML    = btn.dataset.short || '';
-    modalLong.innerHTML     = btn.dataset.long  || '';
-    if (url) { modalUrl.href = url; modalUrl.hidden = false; }
-    else      { modalUrl.hidden = true; }
-    modal.hidden              = false;
+  window.openToolModal = function(tool) {
+    if (typeof tool === 'string') {
+      let found;
+      for (const tools of Object.values(toolsData)) {
+        found = tools.find(t => t.name === tool);
+        if (found) break;
+      }
+      if (!found) return;
+      tool = found;
+    }
+
+    screenshot.classList.add('is-loading');
+    loader.classList.remove('is-hidden');
+    fallback.style.display = 'none';
+    nameTop.textContent = tool.name;
+    sfName.textContent  = tool.name;
+    sfDesc.textContent  = tool.desc || '';
+    if (liveBtn) liveBtn.href = tool.url;
+
+    const img = new Image();
+    const timer = setTimeout(() => {
+      loader.classList.add('is-hidden');
+      fallback.style.display = 'flex';
+    }, 8000);
+
+    img.onload = () => {
+      clearTimeout(timer);
+      screenshot.src = img.src;
+      screenshot.classList.remove('is-loading');
+      loader.classList.add('is-hidden');
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      loader.classList.add('is-hidden');
+      fallback.style.display = 'flex';
+    };
+    img.src = tool.screenshot || getScreenshotUrl(tool.url);
+
+    modal.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    modalClose.focus();
-  }
+    if (closeBtn) closeBtn.focus();
+  };
 
   function closeModal() {
-    modal.hidden = true;
+    modal.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    setTimeout(() => {
+      screenshot.src = '';
+      screenshot.classList.add('is-loading');
+      loader.classList.remove('is-hidden');
+      fallback.style.display = 'none';
+    }, 600);
   }
 
-  document.querySelectorAll('.tool-item').forEach(btn => {
-    btn.addEventListener('click', () => openModal(btn));
+  document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const url  = btn.dataset.url || '#';
+      const name = btn.querySelector('.tool-name')?.textContent || btn.dataset.name || '';
+      const desc = btn.querySelector('.tool-desc')?.textContent || btn.dataset.short || '';
+      window.openToolModal && window.openToolModal({ name, desc, url, screenshot: getScreenshotUrl(url) });
+    });
   });
 
-  modalClose.addEventListener('click', closeModal);
-  modalBg.addEventListener('click', closeModal);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !modal.hidden) closeModal();
-  });
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (backdrop) backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 }
 
 
@@ -847,7 +972,7 @@ function generateCV() {
   doc.setFontSize(8.5);
   doc.setTextColor(...gris);
   doc.text('saliflacan00@gmail.com', 20, 49);
-  doc.text('07 88 68 64 21  ·  06 40 56 13 37', 85, 49);
+  doc.text('07 88 68 64 21', 85, 49);
   doc.text('Bordeaux, 33000  ·  Véhiculé · Permis B', 148, 49);
 
   // ── Formation ──
@@ -862,6 +987,7 @@ function generateCV() {
 
   y += 10;
   const formations = [
+    { badge: 'Master', titre: 'Manager en data marketing ',             ecole: 'INSEEC — Bordeaux', date: '2025 — 2027' },
     { badge: 'Bachelor', titre: 'Marketing Digital, Data & IA',             ecole: 'INSEEC — Bordeaux', date: '2024 — 2025' },
     { badge: 'BTS',      titre: 'Négociation Digitalisation Relation Client', ecole: 'Bordeaux',          date: '2022 — 2024' },
     { badge: 'Bac',      titre: 'Baccalauréat Général — SES & LLCE',         ecole: 'Bordeaux',          date: '2021 — 2022' },
@@ -890,6 +1016,19 @@ function generateCV() {
 
   y += 10;
   const exps = [
+    {
+      role: 'Marketing Digital SEO & management data',
+      company: 'Exosens — Mérignac',
+      date: '2025 — 2027  ·  Alternance',
+      missions: [
+        `Suivi et analyse de toutes les demandes d'informations, devis et soumissions effectuées sur le site internet d'Exosens.`,
+        `Aide et accompagnement de ma supérieure sur les différentes tâches liées à la gestion et à l'évolution du site internet`,
+        `Rédaction et mise en ligne d'articles, de pages et de tout autre contenu sur le site internet d'Exosens.`,
+        `Mise en place de visuels de données permettant à chaque business unit.`,
+        `Accompagnement des équipes sur la prise en main de nouveaux outils.`,
+        `Contribution à l'amélioration du référencement du site à travers le SEO et le GEO.`,
+      ],
+    },
     {
       role: 'NDRC — Négociation Digitalisation Relation Client',
       company: 'Atelier CUB — Mérignac',
@@ -984,170 +1123,3 @@ function generateCV() {
 }
 
 
-/* ══════════════════════════════════════════════════════════════
-   PANNEAU OUTIL — iframe + overlay d'activation (pattern Mango Media)
-══════════════════════════════════════════════════════════════ */
-const toolsDatabase = {
-  /* Data & Analyse */
-  'Google Analytics':      { url: 'https://marketingplatform.google.com/about/analytics/', cat: 'Data & Analyse' },
-  'Power BI':              { url: 'https://powerbi.microsoft.com/fr-fr/', cat: 'Data & Analyse' },
-  'Excel / Google Sheets': { url: 'https://workspace.google.com/products/sheets/', cat: 'Data & Analyse' },
-  'Reporting':             { url: 'https://lookerstudio.google.com', cat: 'Data & Analyse' },
-  'Analyse données':       { url: 'https://datastudio.google.com', cat: 'Data & Analyse' },
-  /* Marketing Digital */
-  'Meta Ads':                   { url: 'https://www.facebook.com/business/ads', cat: 'Marketing Digital' },
-  'SEO':                        { url: 'https://search.google.com/search-console/about', cat: 'Marketing Digital' },
-  'Email Marketing':            { url: 'https://mailchimp.com', cat: 'Marketing Digital' },
-  'Community Management':       { url: 'https://buffer.com', cat: 'Marketing Digital' },
-  'Stratégie digitale':         { url: 'https://semrush.com', cat: 'Marketing Digital' },
-  'Digitalisation commerciale': { url: 'https://salesforce.com', cat: 'Marketing Digital' },
-  /* Outils & Plateformes */
-  'Microsoft 365':    { url: 'https://www.microsoft.com/fr-fr/microsoft-365', cat: 'Outils & Plateformes' },
-  'Google Workspace': { url: 'https://workspace.google.com', cat: 'Outils & Plateformes' },
-  'Figma':            { url: 'https://figma.com', cat: 'Outils & Plateformes' },
-  'Notion':           { url: 'https://notion.so', cat: 'Outils & Plateformes' },
-  'CMS / WordPress':  { url: 'https://wordpress.org', cat: 'Outils & Plateformes' },
-  'Canva':            { url: 'https://canva.com', cat: 'Outils & Plateformes' },
-  /* Relation Client & Vente */
-  'CRM':                    { url: 'https://hubspot.com', cat: 'Relation Client & Vente' },
-  'Vente multicanal':       { url: 'https://pipedrive.com', cat: 'Relation Client & Vente' },
-  'Prospection digitale':   { url: 'https://linkedin.com/sales', cat: 'Relation Client & Vente' },
-  'Communication multicanal':{ url: 'https://hootsuite.com', cat: 'Relation Client & Vente' },
-};
-
-function initToolPanel() {
-  const panel          = document.getElementById('tool-panel');
-  const backdrop       = document.getElementById('tool-panel-backdrop');
-  const closeBtn       = document.getElementById('panel-close');
-  const iframe         = document.getElementById('tool-iframe');
-  const urlDisplay     = document.getElementById('url-display');
-  const nameEl         = document.getElementById('tool-panel-name');
-  const catEl          = document.getElementById('tool-panel-cat');
-  const iframeOverlay  = document.getElementById('iframe-overlay');
-  const fallback       = document.getElementById('tool-iframe-fallback');
-  const fallbackOpen   = document.getElementById('fallback-open');
-  const fallbackName   = document.getElementById('fallback-name');
-  const fallbackShort  = document.getElementById('fallback-short');
-  const fallbackLong   = document.getElementById('fallback-long');
-  if (!panel) return;
-
-  /* Marquer les skill-tags (#outils) qui ont une entrée dans la DB */
-  document.querySelectorAll('#outils .skill-tag').forEach(tag => {
-    const label = tag.textContent.trim();
-    if (toolsDatabase[label]) {
-      tag.setAttribute('data-tool', label);
-      tag.setAttribute('role', 'button');
-      tag.setAttribute('tabindex', '0');
-    }
-  });
-
-  /* Invite au-dessus de la grille #outils (une seule fois) */
-  const skillsGrid = document.querySelector('#outils .skills-grid');
-  if (skillsGrid && !skillsGrid.parentNode.querySelector('.skills-invite')) {
-    const invite = document.createElement('p');
-    invite.className = 'skills-invite';
-    invite.textContent = "Cliquez sur un outil pour l'explorer";
-    skillsGrid.parentNode.insertBefore(invite, skillsGrid);
-  }
-
-  let fallbackTimer = null;
-
-  /*
-   * openPanel({ name, url, cat, short, long })
-   * Utilisé par skill-tags (#outils) ET tool-items (#logiciels)
-   */
-  function openPanel({ name, url, cat, short = '', long = '' }) {
-    /* Reset */
-    clearTimeout(fallbackTimer);
-    iframeOverlay.classList.remove('is-activated');
-    fallback.classList.remove('is-visible');
-    iframe.src = '';
-
-    /* Remplir le panneau */
-    nameEl.textContent        = name;
-    catEl.textContent         = cat;
-    fallbackName.textContent  = name;
-    fallbackOpen.href         = url;
-    fallbackShort.textContent = short;
-    fallbackLong.textContent  = long;
-    urlDisplay.textContent    = url.replace(/^https?:\/\//, '').split('/')[0];
-
-    /* Charger l'iframe */
-    iframe.src = url;
-
-    /* Fallback si l'iframe ne se charge pas en 5 s */
-    fallbackTimer = setTimeout(() => {
-      fallback.classList.add('is-visible');
-    }, 5000);
-
-    iframe.onload = () => {
-      clearTimeout(fallbackTimer);
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body) throw new Error('blocked');
-      } catch (_) {
-        fallback.classList.add('is-visible');
-        iframeOverlay.classList.add('is-activated');
-      }
-    };
-
-    panel.classList.add('is-open');
-    panel.setAttribute('aria-hidden', 'false');
-    backdrop.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-    closeBtn.focus();
-  }
-
-  function closePanel() {
-    panel.classList.remove('is-open');
-    panel.setAttribute('aria-hidden', 'true');
-    backdrop.classList.remove('is-open');
-    document.body.style.overflow = '';
-    clearTimeout(fallbackTimer);
-
-    /* Vider l'iframe après la transition */
-    setTimeout(() => {
-      iframe.src = '';
-      iframeOverlay.classList.remove('is-activated');
-      fallback.classList.remove('is-visible');
-    }, 750);
-  }
-
-  /* Overlay → activer l'iframe */
-  iframeOverlay.addEventListener('click', () => {
-    iframeOverlay.classList.add('is-activated');
-    iframe.focus();
-  });
-
-  /* Skill tags (#outils) */
-  document.querySelectorAll('.skill-tag[data-tool]').forEach(tag => {
-    const open = () => {
-      const name = tag.getAttribute('data-tool');
-      const d    = toolsDatabase[name];
-      if (d) openPanel({ name, url: d.url, cat: d.cat });
-    };
-    tag.addEventListener('click', open);
-    tag.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
-    });
-  });
-
-  /* Tool items (#logiciels) — remplace l'ancien modal texte */
-  document.querySelectorAll('#logiciels .tool-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      openPanel({
-        name:  btn.dataset.name  || '',
-        url:   btn.dataset.url   || '#',
-        cat:   btn.closest('.tool-cat')?.querySelector('.tool-cat-title')?.textContent || 'Outil',
-        short: btn.dataset.short || '',
-        long:  btn.dataset.long  || '',
-      });
-    });
-  });
-
-  closeBtn.addEventListener('click', closePanel);
-  backdrop.addEventListener('click', closePanel);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
-  });
-}
